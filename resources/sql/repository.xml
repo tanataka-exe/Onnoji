@@ -1,0 +1,614 @@
+<?xml version="1.0"?>
+<resources>
+  <group id="artist">
+    <sql id="artist-next-id">
+      select
+        case
+          when (select count(*) from artist) = 0 then
+            1
+          when minrownum is not null then
+            minrownum
+          else
+            (select max(artist_id) + 1 from artist)
+        end as new_artist_id
+      from
+        (
+          select
+            min(rownum) as minrownum
+          from
+            (
+              select
+                row_number() over (order by artist_id) as rownum,
+                artist_id
+              from
+                artist
+            )
+          where
+            rownum &lt;&gt; artist_id
+        )
+    </sql>
+    <sql id="artist-check-existence">
+      select count(*) from artist where <replacement>artist_id = ##artist_id::int</replacement>
+    </sql>
+    <sql id="artist-check-existence-lazy">
+      select count(*) from songs where <replacement>artist_name like ##artist_name::string || '%'</replacement>
+    </sql>
+    <sql id="artist-insert-row">
+      insert into artist (artist_id, artist_name) values (##artist_id::int, ##artist_name::string)
+    </sql>
+    <sql id="artist-update-by-id">
+      update artist set artist_name = ##artist_name::string where artist_id = ##artist_id::int
+    </sql>
+    <sql id="artist-delete-by-id">
+      delete from artist where <replacement>artist_id = ##artist_id::int</replacement>
+    </sql>
+    <sql id="artist-select-by-id">
+      select artist_id, artist_name from artist where <replacement>artist_id = ##artist_id::int</replacement>
+    </sql>
+    <sql id="artist-select-by-name">
+      select artist_id, artist_name from artist where <replacement>artist_name = ##artist_name::string</replacement>
+    </sql>
+    <sql id="artist-select-by-song-id">
+      select t1.artist_id, t1.artist_name
+      from artist t1
+      where t1.artist_id in (
+          select t2.artist_id from song_artist t2
+          where t2.<replacement>song_id = ##song_id::int</replacement>
+        )
+    </sql>
+    <sql id="artist-select-by-genre-id">
+      select t1.artist_id, t1.artist_name
+      from artist t1
+      where t1.artist_id in (
+          select t2.artist_id from artist_genre t2
+          where t2.<replacement>genre_id = ##genre_id::int</replacement>
+        )
+    </sql>
+    <sql id="artist-select-by-playlist-id">
+      select t1.artist_id, t1.artist_name
+      from artist t1
+      where t1.artist_id in (
+          select t2.artist_id from playlist_artist t2
+          where t2.<replacement>playlist_id = ##playlist_id::int</replacement>
+        )
+    </sql>
+  </group>
+  <group id="genre">
+    <sql id="genre-next-id">
+      select
+        case
+          when (select count(*) from genre) = 0 then
+            1
+          when minrownum is not null then
+            minrownum
+          else
+            (select max(genre_id) + 1 from genre)
+        end as new_genre_id
+      from
+        (
+          select
+            min(rownum) as minrownum
+          from
+            (
+              select
+                row_number() over (order by genre_id) as rownum,
+                genre_id
+              from
+                genre
+            )
+          where
+            rownum &lt;&gt; genre_id
+        )
+    </sql>
+    <sql id="genre-select-by-id">
+      select genre_id, genre_name, genre_file_path from genre where <replacement>genre_id = ##genre_id::int</replacement>
+    </sql>
+    <sql id="genre-select-by-name">
+      select genre_id, genre_name, genre_file_path from genre where <replacement>genre_name = ##genre_name::string</replacement>
+    </sql>
+    <sql id="genre-select-by-song-id">
+      select t1.genre_id, t1.genre_name, t1.genre_file_path
+      from genre t1
+      where t1.genre_id in (
+          select t2.genre_id from song_genre t2
+          where t2.<replacement>song_id = ##song_id::int</replacement>
+          group by t2.genre_id
+        )
+    </sql>
+    <sql id="genre-select-by-playlist-id">
+      select t1.genre_id, t1.genre_name, t1.genre_file_path
+      from genre t1
+      where t1.genre_id in (
+          select t2.genre_id from playlist_genre t2
+          where t2.<replacement>playlist_id = ##playlist_id::int</replacement>
+        )
+    </sql>
+    <sql id="genre-select-by-artist-id">
+      select t1.genre_id, t1.genre_name, t1.genre_file_path
+      from genre t1
+      where t1.genre_id in (
+          select t2.genre_id from song_genre t2
+          inner join song t3 on t3.song_id = t2.song_id
+          inner join song_artist t4 on t4.song_id = t3.song_id
+          where t4.<replacement>artist_id = ##artist_id::int</replacement>
+        )
+    </sql>
+    <sql id="genre-delete-by-id">
+      delete from genre where genre_id = ##genre_id::int
+    </sql>
+    <sql id="genre-update-by-id">
+      update genre set
+        genre_name = ##new_name::string,
+        genre_file_path = ##new_path::string
+      where
+        genre_id = ##genre_id::int
+    </sql>
+    <sql id="genre-insert-row">
+      insert into genre (genre_id, genre_name) values (##genre_id::int, ##genre_name::string)
+    </sql>
+  </group>
+  <group id="song">
+    <sql id="song-next-id">
+      select
+        case
+          when (select count(*) from song) = 0 then
+            1
+          when minrownum is not null then
+            minrownum
+          else
+            (select max(song_id) + 1 from song)
+        end as new_song_id
+      from
+        (
+          select
+            min(rownum) as minrownum
+          from
+            (
+              select
+                row_number() over (order by song_id) as rownum,
+                song_id
+              from
+                song
+            )
+          where
+            rownum &lt;&gt; song_id
+        )
+    </sql>
+    <sql id="song-select-by-id">
+      select song_id, title, pub_date, copyright, comment, time_length_milliseconds,
+        mime_type, digest, file_path, artwork_id, creation_datetime
+      from song
+      where <replacement>song_id = ##song_id::int</replacement>
+    </sql>
+    <sql id="song-select-by-playlist-id">
+      select t1.song_id, title, pub_date, copyright, comment, time_length_milliseconds,
+        mime_type, digest, file_path, artwork_id, creation_datetime
+      from song t1
+      where t1.song_id in (
+          select t2.song_id from song_playlist t2
+          where t2.<replacement>playlist_id = ##playlist_id::int</replacement>
+        )
+    </sql>
+    <sql id="song-select-by-artist-id">
+      select t1.song_id, title, pub_date, copyright, comment, time_length_milliseconds,
+          mime_type, digest, file_path, artwork_id, creation_datetime
+      from song t1
+      where t1.song_id in (
+          select t2.song_id from song_artist t2
+          where t2.<replacement>artist_id = ##artist_id::int</replacement>
+        )
+    </sql>
+    <sql id="song-select-by-genre-id">
+      select t1.song_id, title, pub_date, copyright, comment, time_length_milliseconds,
+          mime_type, digest, file_path, artwork_id, creation_datetime
+      from song t1
+      where t1.song_id in (
+          select t2.song_id from song_genre t2
+          where t2.<replacement>genre_id = ##genre_id::int</replacement>
+        )
+    </sql>
+    <sql id="song-select-recently-registered">
+      select
+        song_id, title, pub_date, copyright, comment, time_length_milliseconds,
+        mime_type, file_path, digest, artwork_id, creation_datetime
+      from
+        (
+          select
+            row_number() over (order by creation_datetime desc) as rownum,
+            song_id, title, pub_date, copyright, comment, time_length_milliseconds,
+            mime_type, file_path, digest, artwork_id, creation_datetime
+          from
+            song
+          order by
+            creation_datetime desc
+        )
+      where
+        rownum &gt;= ##min_limit::int and rownum &lt;= ##max_limit::int
+      order by
+        creation_datetime desc
+    </sql>
+    <sql id="song-select-recently-requested">
+      select
+        song_id, title, pub_date, copyright, comment, time_length_milliseconds,
+        mime_type, file_path, digest, artwork_id, creation_datetime
+      from
+        (
+          select
+            row_number() over (
+              order by
+                t1.request_datetime desc
+            ) as rownum,
+            t1.song_id, t2.title, t2.pub_date, t2.copyright, t2.comment, t2.time_length_milliseconds,
+            t2.mime_type, t2.file_path, t2.digest, t2.artwork_id, t2.creation_datetime
+          from
+            history t1
+          inner join
+            song t2
+           on
+            t2.song_id = t1.song_id
+          order by
+            1
+        )
+      where
+        rownum &gt;= ##min_limit::int
+       and
+        rownum &lt;= ##max_limit::int
+    </sql>
+    <sql id="song-delete-by-id">
+      delete from song where <replacement>song_id = ##song_id::int</replacement>
+    </sql>
+    <sql id="song-select-link-to-playlist">
+      select
+        song_id, playlist_id, disc_number, track_number
+      from
+        song_playlist
+      where
+        song_id = ##song_id::int and playlist_id = ##playlist_id::int
+    </sql>
+    <sql id="song-update-link-to-playlist">
+      update song_playlist
+      set
+        disc_number = ##disc_number::int,
+        track_number = ##track_number::int
+      where
+        song_id = ##song_id::int
+       and
+        playlist_id = ##playlist_id::int
+    </sql>
+    <sql id="song-delete-link-to-playlist">
+      delete from song_playlist
+      where
+        song_id = ##song_id::int
+       and
+        playlist_id = ##playlist_id::int
+    </sql>
+    <sql id="song-select-link-to-artist">
+      select
+        song_id, artist_id
+      from
+        song_artist
+      where
+        song_id = ##song_id::int and artist_id = ##artist_id::int
+    </sql>
+    <sql id="song-delete-link-to-artist">
+      delete from song_artist
+      where
+        song_id = ##song_id::int
+       and
+        artist_id = ##artist_id::int
+    </sql>
+    <sql id="song-select-link-to-genre">
+      select
+        song_id, genre_id
+      from
+        song_genre
+      where
+        song_id = ##song_id::int and genre_id = ##genre_id::int
+    </sql>
+    <sql id="song-delete-link-to-genre">
+      delete from song_genre
+      where
+        song_id = ##song_id::int
+       and
+        genre_id = ##genre_id::int
+    </sql>
+  </group>
+  <group id="history">
+    <sql id="history-next-id">
+      select
+        case
+          when (select count(*) from history) = 0 then
+            1
+          when minrownum is not null then
+            minrownum
+          else
+            (select max(history_id) + 1 from history)
+        end as new_history_id
+      from
+        (
+          select
+            min(rownum) as minrownum
+          from
+            (
+              select
+                row_number() over (order by history_id) as rownum,
+                history_id
+              from
+                history
+            )
+          where
+            rownum &lt;&gt; history_id
+        )
+    </sql>
+    <sql id="history-select-by-id">
+      select history_id, song_id, request_datetime from history where <replacement>history_id = ##history_id::int</replacement>
+    </sql>
+    <sql id="history-select-by-request-datetime">
+      select history_id, song_id, request_datetime from history
+      where <replacement>request_datetime = ##request_datetime::GdaTimestamp</replacement>
+    </sql>
+    <sql id="history-delete-by-id">
+      delete from history where <replacement>history_id = ##history_id::int</replacement>
+    </sql>
+    <sql id="history-select-by-song-id">
+      select t1.history_id, t1.song_id, t1.request_datetime
+      from history t1
+      where <replacement>t1.song_id = ##song_id::int</replacement>
+    </sql>
+  </group>
+  <group id="playlist">
+    <sql id="playlist-next-id">
+      select
+        case
+          when (select count(*) from playlist) = 0 then
+            1
+          when minrownum is not null then
+            minrownum
+          else
+            (select max(playlist_id) + 1 from playlist)
+        end as new_playlist_id
+      from
+        (
+          select
+            min(rownum) as minrownum
+          from
+            (
+              select
+                row_number() over (order by playlist_id) as rownum,
+                playlist_id
+              from
+                playlist
+            )
+          where
+            rownum &lt;&gt; playlist_id
+        )
+    </sql>
+    <sql id="playlist-select-by-id">
+      select playlist_id, playlist_name, is_album, creation_datetime, update_datetime
+      from playlist where <replacement>playlist_id = ##playlist_id::int</replacement>
+    </sql>
+    <sql id="playlist-select-by-genre-id">
+      select playlist_id, playlist_name, is_album, creation_datetime, update_datetime
+      from playlist t1
+      where t1.playlist_id in (
+          select playlist_id from playlist_genre t2
+          where <replacement>genre_id = ##genre_id::int</replacement>
+        )
+    </sql>
+    <sql id="playlist-select-by-artist-id">
+      select playlist_id, playlist_name, is_album, creation_datetime, update_datetime from playlist t1
+      where playlist_id in (
+          select t2.playlist_id from playlist_artist t2
+          where <replacement>artist_id = ##artist_id::int</replacement>
+        )
+    </sql>
+    <sql id="playlist-select-by-song-id">
+      select playlist_id, playlist_name, is_album, creation_datetime, update_datetime
+      from playlist t1
+      where playlist_id in (
+          select playlist_id from song_playlist t2
+          where <replacement>song_id = ##song_id::int</replacement>
+        )
+    </sql>
+    <sql id="playlist-delete-by-id">
+      delete from playlist where <replacement>playlist_id = ##playlist_id::int</replacement>
+    </sql>
+    <sql id="playlist-select-by-song-id">
+      select t1.playlist_id, t1.playlist_name, t1.is_album, t1.creation_datetime, t1.update_datetime
+      from playlist t1
+      where playlist_id in (
+          select playlist_id from song_playlist t2
+          where t2.<replacement>song_id = ##song_id::int</replacement>
+        )
+    </sql>
+    <sql id="playlist-select-recently-registered">
+      select
+        playlist_id, playlist_name, is_album, creation_datetime, update_datetime
+      from
+        (
+          select
+            row_number() over (order by creation_datetime desc) as rownum,
+            playlist_id, playlist_name, is_album, creation_datetime, update_datetime
+          from
+            playlist
+        )
+      where
+        rownum &gt;= ##min_limit::int and rownum &lt;= ##max_limit::int
+       and is_album = ##is_album::string
+      order by
+        creation_datetime desc
+    </sql>
+    <sql id="playlist-select-recently-requested">
+      select
+        *
+      from
+        playlist
+      where
+        playlist_id in (
+          select
+            playlist_id
+          from
+            (
+              select
+                row_number() over (
+                  order by latest_requested_datetime desc
+                ) as rownum,
+                playlist_id,
+                latest_requested_datetime
+              from
+                (
+                  select
+                    t2.playlist_id,
+                    max(t1.request_datetime) as latest_requested_datetime
+                  from
+                    history t1
+                  inner join
+                    song_playlist t2
+                   on
+                    t2.song_id = t1.song_id
+                  inner join
+                    playlist t3
+                   on
+                    t3.playlist_id = t2.playlist_id
+                  where
+                    t3.is_album = ##is_album::string
+                  group by
+                    t2.playlist_id
+                )
+            )
+          where
+            rownum &gt;= ##min_limit::int
+           and
+            rownum &lt;= ##max_limit::int
+          order by
+            latest_requested_datetime
+        )
+    </sql>
+  </group>
+  <group id="artwork">
+    <sql id="artwork-next-id">
+      select
+        case
+          when (select count(*) from artwork) = 0 then
+            1
+          when minrownum is not null then
+            minrownum
+          else
+            (select max(artwork_id) + 1 from artwork)
+        end as new_artwork_id
+      from
+        (
+          select
+            min(rownum) as minrownum
+          from
+            (
+              select
+                row_number() over (order by artwork_id) as rownum,
+                artwork_id
+              from
+                artwork
+            )
+          where
+            rownum &lt;&gt; artwork_id
+        )
+    </sql>
+    <sql id="artwork-select-by-id">
+      select artwork_id, artwork_file_path, mime_type, digest from artwork where <replacement>artwork_id = ##artwork_id::int</replacement>
+    </sql>
+    <sql id="artwork-select-by-digest">
+      select artwork_id, artwork_file_path, mime_type, digest from artwork where <replacement>digest = ##digest::string</replacement>
+    </sql>
+    <sql id="artwork-select-by-song-id">
+      select t1.artwork_id, t1.artwork_file_path, t1.mime_type, t1.digest
+      from artwork t1
+      where t1.artwork_id in (
+          select t2.artwork_id from song t2
+          where t2.<replacement>song_id = ##song_id::int</replacement>
+          group by t2.artwork_id
+        )
+    </sql>
+    <sql id="artwork-select-by-playlist-id">
+      select t1.artwork_id, t1.artwork_file_path, t1.mime_type, t1.digest
+      from artwork t1
+      where t1.artwork_id in (
+          select t2.artwork_id from playlist_artwork t2
+          where t2.<replacement>playlist_id = ##playlist_id::int</replacement>
+        )
+    </sql>
+    <sql id="artwork-select-by-artist-id">
+      select t1.artwork_id, t1.artwork_file_path, t1.mime_type, t1.digest
+      from artwork t1
+      where t1.artwork_id in (
+          select t2.artwork_id from song t2
+          inner join song_artist t3 on t3.song_id = t2.song_id
+          where t2.<replacement>artist_id = ##artist_id::int</replacement>
+        )
+    </sql>
+    <sql id="artwork-delete-by-id">
+      delete from
+        artwork
+      where
+        <replacement>artwork_id = ##artwork_id::int</replacement>
+    </sql>
+    <sql id="artwork-update-by-id">
+      update
+        artwork
+      set
+        artwork_file_path = ##new_path::string,
+        mime_type = ##new_mime_type::string,
+        digest = ##new_digest::string
+      where
+        artwork_id = ##artwork_id::int
+    </sql>
+  </group>
+  <group id="conditions">
+    <sql id="digest-equals">digest = ##equals_digest::string</sql>
+    <sql id="digest-starts-with">digest like ##starts_with_digest::string || '%'</sql>
+    <sql id="digest-ends-with">digest like ##ends_with_digest::string || '%'</sql>
+    <sql id="digest-includes">digest like '%' || ##includes_digest::string || '%'</sql>
+    <sql id="song-id-equals">song_id = ##equals_song_id::int</sql>
+    <sql id="song-id-gt">song_id &gt; ##gt_song_id::int</sql>
+    <sql id="song-id-ge">song_id &gt;= ##ge_song_id::int</sql>
+    <sql id="song-id-lt">song_id &lt; ##lt_song_id::int</sql>
+    <sql id="song-id-le">song_id &lt;= ##le_song_id::int</sql>
+    <sql id="playlist-id-equals">playlist_id = ##equals_playlist_id::int</sql>
+    <sql id="playlist-id-gt">playlist_id &gt; ##gt_playlist_id::int</sql>
+    <sql id="playlist-id-ge">playlist_id &gt;= ##ge_playlist_id::int</sql>
+    <sql id="playlist-id-lt">playlist_id &lt; ##lt_playlist_id::int</sql>
+    <sql id="playlist-id-le">playlist_id &lt;= ##le_playlist_id::int</sql>
+    <sql id="genre-id-equals">genre_id = ##equals_genre_id::int</sql>
+    <sql id="genre-id-gt">genre_id &gt; ##gt_genre_id::int</sql>
+    <sql id="genre-id-ge">genre_id &gt;= ##ge_genre_id::int</sql>
+    <sql id="genre-id-lt">genre_id &lt; ##lt_genre_id::int</sql>
+    <sql id="genre-id-le">genre_id &lt;= ##le_genre_id::int</sql>
+    <sql id="genre-name-equals">genre_name = ##equals_genre_name::string</sql>
+    <sql id="genre-name-starts-with">genre_name like ##starts_with_genre_name::string || '%'</sql>
+    <sql id="genre-name-ends-with">genre_name like ##ends_with_genre_name::string || '%'</sql>
+    <sql id="genre-name-includes">genre_name like '%' || ##includes_genre_name::string || '%'</sql>
+    <sql id="artist-id-equals">artist_id = ##equals_artist_id::int</sql>
+    <sql id="artist-id-gt">artist_id &gt; ##gt_artist_id::int</sql>
+    <sql id="artist-id-ge">artist_id &gt;= ##ge_artist_id::int</sql>
+    <sql id="artist-id-lt">artist_id &lt; ##lt_artist_id::int</sql>
+    <sql id="artist-id-le">artist_id &lt;= ##le_artist_id::int</sql>
+    <sql id="artist-name-equals">artist_name = ##equals_artist_name::string</sql>
+    <sql id="artist-name-starts-with">artist_name like ##starts_with_artist_name::string || '%'</sql>
+    <sql id="artist-name-ends-with">artist_name like ##ends_with_artist_name::string || '%'</sql>
+    <sql id="artist-name-includes">artist_name like '%' || ##includes_artist_name::string || '%'</sql>
+    <sql id="history-id-equals">history_id = ##equals_history_id::int</sql>
+    <sql id="history-id-gt">history_id &gt; ##gt_history_id::int</sql>
+    <sql id="history-id-ge">history_id &gt;= ##ge_history_id::int</sql>
+    <sql id="history-id-lt">history_id &lt; ##lt_history_id::int</sql>
+    <sql id="history-id-le">history_id &lt;= ##le_history_id::int</sql>
+    <sql id="request-datetime-equals">request_datetime = ##equals_request_datetime::int</sql>
+    <sql id="request-datetime-gt">request_datetime &gt; ##gt_request_datetime::int</sql>
+    <sql id="request-datetime-ge">request_datetime &gt;= ##ge_request_datetime::int</sql>
+    <sql id="request-datetime-lt">request_datetime &lt; ##lt_request_datetime::int</sql>
+    <sql id="request-datetime-le">request_datetime &lt;= ##le_request_datetime::int</sql>
+    <sql id="artwork-id-equals">artwork_id = ##equals_artwork_id::int</sql>
+    <sql id="artwork-id-gt">artwork_id &gt; ##gt_artwork_id::int</sql>
+    <sql id="artwork-id-ge">artwork_id &gt;= ##ge_artwork_id::int</sql>
+    <sql id="artwork-id-lt">artwork_id &lt; ##lt_artwork_id::int</sql>
+    <sql id="artwork-id-le">artwork_id &lt;= ##le_artwork_id::int</sql>
+  </group>
+</resources>
+

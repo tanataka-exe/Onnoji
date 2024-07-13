@@ -19,20 +19,26 @@
 
 namespace Moegi {
     public class FileInfoAdapter : Object {
+        public Moegi.MetadataReader meta_reader { get; construct set; }
+        private Moegi.FileInfo file_info;
+        
+        public FileInfoAdapter(Moegi.MetadataReader meta_reader) {
+            this.meta_reader = meta_reader;
+            this.meta_reader.tag_found.connect((tag, value) => {
+                file_info_set_value(ref file_info, tag, value);
+                return true;
+            });
+        }
+        
         public Moegi.FileInfo? read_metadata_from_path(string file_path) {
             GLib.File file = GLib.File.new_for_path(file_path);
-            Moegi.FileInfo file_info = new Moegi.FileInfo();
+            this.file_info = new Moegi.FileInfo();
             file_info.dir = file.get_parent().get_path();
             file_info.path = file.get_path();
             file_info.name = file.get_basename();
             file_info.type = Moegi.FileType.MUSIC;
             try {
-                MetadataReader meta_reader = new Moegi.MetadataReader();
-                meta_reader.tag_found.connect((tag, value) => {
-                    file_info_set_value(ref file_info, tag, value);
-                    return true;
-                });
-                meta_reader.get_metadata(file_path);
+                meta_reader.get_metadata(file.get_path());
                 return file_info;
             } catch (Moegi.Error e) {
                 stderr.printf(@"Moegi.Error: $(e.message)\n");
@@ -100,7 +106,7 @@ namespace Moegi {
                 break;
 
               case "duration":
-                file_info.time_length = (Moegi.SmallTime)value.get_object();
+                file_info.time_length_milliseconds = value.get_uint();
                 break;
 
               case "image":

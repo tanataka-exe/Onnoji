@@ -1,0 +1,5 @@
+[Flags]
+public enum SqlConditionType {
+    EQUALS, GREATER_THAN, LESS_THAN, NOT_EQUAL, STARTS_WITH, ENDS_WITH, INCLUDES
+}
+

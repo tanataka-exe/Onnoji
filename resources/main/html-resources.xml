@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<resources>
+  <html id="redirect-default-artwork">
+    <![CDATA[
+    <!DOCTYPE html>
+    <html lang="ja>
+      <head>
+        <meta http-equiv="Refresh" content="0; URL=/api/v2/artwork/1"/>
+      </head>
+    </html>
+    ]]>
+  </html>
+</resources>

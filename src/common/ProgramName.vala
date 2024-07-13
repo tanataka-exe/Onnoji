@@ -18,5 +18,5 @@
  */
 
 namespace Moegi {
-    public const string PROGRAM_NAME = "com.github.aharotias2.music-server";
+    public const string PROGRAM_NAME = "com.github.aharotias2.onnoji";
 }

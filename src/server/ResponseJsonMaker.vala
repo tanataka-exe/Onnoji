@@ -1,200 +1,158 @@
 public class ResponseJsonMaker : Object {
-    public static Json.Node make_song_metadata(SongData data, ArtistData? artist, AlbumData? album, GenreData? genre,
-            string song_url, string artwork_url, Gee.Map<string, string> metadata_map) {
-        Json.Node song_metadata_json = new Json.Node(Json.NodeType.OBJECT);
+    public Json.Node object_node(Json.Object obj) {
+        Json.Node node = new Json.Node(Json.NodeType.OBJECT);
+        node.init_object(obj);
+        return node;
+    }
+
+    public Json.Node array_node(Json.Array arr) {
+        Json.Node node = new Json.Node(Json.NodeType.ARRAY);
+        node.init_array(arr);
+        return node;
+    }
+
+    public Json.Node named_array_node(string name, Json.Array arr) {
+        Json.Object parent_obj = new Json.Object();
+        parent_obj.set_array_member(name, arr);
+        return object_node(parent_obj);
+    }
+
+    public Json.Node named_object_node(string name, Json.Object obj) {
+        Json.Object parent_obj = new Json.Object();
+        parent_obj.set_object_member(name, obj);
+        return object_node(parent_obj);
+    }
+
+    public Json.Array empty_array() {
+        return new Json.Array();
+    }
+    
+    public Json.Object song_metadata_object(Song song) {
         Json.Object song_object = new Json.Object();
-        song_metadata_json.init_object(song_object);
-        
-        song_object.set_string_member("id", data.song_id);
-        song_object.set_string_member("title", data.title);
-        song_object.set_int_member("artist_id", data.artist_id);
-        if (artist != null) {
-            song_object.set_string_member("artist_name", artist.name);
+        song_object.set_int_member("songId", song.song_id);
+        song_object.set_string_member("title", song.title);
+        if (song.pub_date != 0) {
+            song_object.set_int_member("pubDate", song.pub_date);
         } else {
-            song_object.set_null_member("artist_name");
+            song_object.set_null_member("pubDate");
         }
-        song_object.set_int_member("genre_id", data.genre_id);
-        if (genre != null) {
-            song_object.set_string_member("genre_name", genre.name);
-        } else {
-            song_object.set_null_member("genre_name");
-        }
-        song_object.set_string_member("album_id", data.album_id);
-        if (album != null) {
-            song_object.set_string_member("album_name", album.name);
-        } else {
-            song_object.set_null_member("album_name");
-        }
-        song_object.set_int_member("disc_number", data.disc_number);
-        song_object.set_int_member("track_number", data.track_number);
-        song_object.set_int_member("pub_date", data.pub_date);
-        if (data.copyright != null) {
-            song_object.set_string_member("copyright", data.copyright);
+        if (song.copyright != null) {
+            song_object.set_string_member("copyright", song.copyright);
         } else {
             song_object.set_null_member("copyright");
         }
-        if (data.comment != null) {
-            song_object.set_string_member("comment", data.comment);
+        if (song.comment != null) {
+            song_object.set_string_member("comment", song.comment);
         } else {
             song_object.set_null_member("comment");
         }
-        song_object.set_string_member("time_length", data.time_length.to_string());
-        song_object.set_string_member("mime_type", data.mime_type);
-        song_object.set_string_member("data_url", song_url);
-        song_object.set_string_member("artwork_url", artwork_url);
-        song_object.set_string_member("creation_datetime", data.creation_datetime.format_iso8601());
-        Json.Object metadata_object = new Json.Object();
-        foreach (var key in metadata_map.keys) {
-            metadata_object.set_string_member(key, metadata_map[key]);
-        }
-        song_object.set_object_member("metadata", metadata_object);
-        return song_metadata_json;
+        song_object.set_string_member("mimeType", song.mime_type);
+        song_object.set_string_member("digest", song.digest);
+        song_object.set_int_member("timeLengthMilliseconds", song.time_length_milliseconds);
+        song_object.set_string_member("artists", OnnojiPaths.song_artists_url(song.song_id));
+        song_object.set_string_member("genres", OnnojiPaths.song_genres_url(song.song_id));
+        song_object.set_string_member("albums", OnnojiPaths.song_albums_url(song.song_id));
+        song_object.set_string_member("playlists", OnnojiPaths.song_playlists_url(song.song_id));
+        song_object.set_string_member("stream", OnnojiPaths.song_stream_url(song.song_id));
+        song_object.set_string_member("artwork", OnnojiPaths.song_artwork_url(song.song_id));
+        return song_object;
     }
     
-    public static Json.Node make_songs(Gee.List<Gee.Map<string, string>> songs, Soup.URI req_uri)
-            throws OnnojiError {
-        Json.Node songs_json = new Json.Node(OBJECT);
-        Json.Object root_object = new Json.Object();
+    public Json.Array song_array(Gee.List<Song> songs) throws OnnojiError {
         Json.Array song_array = new Json.Array();
-        foreach (Gee.Map<string, string> data in songs) {
-            Json.Object song_object = new Json.Object();
-            if (!data.has_key("SONG_ID")) {
-                throw new OnnojiError.LOGICAL_ERROR("SONG_ID must be set");
-            }
-            song_object.set_string_member("song_id", data["SONG_ID"].substring(0, ID_LENGTH));
-            song_object.set_string_member("title", data["TITLE"]);
-            if (data["ARTIST_ID"] == "0") {
-                song_object.set_null_member("artist_id");
-                song_object.set_null_member("artist_name");
-            } else {
-                song_object.set_int_member("artist_id", int.parse(data["ARTIST_ID"]));
-                song_object.set_string_member("artist_name", data["ARTIST_NAME"]);
-            }
-            if (data["GENRE_ID"] == "0") {
-                song_object.set_null_member("genre_id");
-                song_object.set_null_member("genre_name");
-            } else {
-                song_object.set_int_member("genre_id", int.parse(data["GENRE_ID"]));
-                song_object.set_string_member("genre_name", data["GENRE_NAME"]);
-            }
-            if (data.has_key("ALBUM_ID")) {
-                song_object.set_string_member("album_id", data["ALBUM_ID"].substring(0, ID_LENGTH));
-                song_object.set_string_member("album_name", data["ALBUM_NAME"]);
-            } else {
-                song_object.set_null_member("album_id");
-                song_object.set_null_member("album_name");
-            }
-            song_object.set_int_member("disc_number", int.parse(data["DISC_NUMBER"]));
-            song_object.set_int_member("track_number", int.parse(data["TRACK_NUMBER"]));
-            song_object.set_int_member("pub_date", int.parse(data["PUB_DATE"]));
-            song_object.set_string_member("copyright", data["COPYRIGHT"]);
-            song_object.set_string_member("comment", data["COMMENT"]);
-            song_object.set_string_member("time_length", data["TIME_LENGTH"]);
-            song_object.set_string_member("mime_type", data["MIME_TYPE"]);
-
-            string file_url = OnnojiUtils.make_song_url(req_uri, data["SONG_ID"]);
-            song_object.set_string_member("file_url", file_url);
-
-            if (data.has_key("ARTWORK_FILE_PATH")) {
-                string artwork_url = OnnojiUtils.make_artwork_url(req_uri, data["ARTWORK_FILE_PATH"]);
-                song_object.set_string_member("artwork_url", artwork_url);
-            } else {
-                song_object.set_null_member("artwork_url");
-            }
-            
-            string creation_datetime = data["CREATION_DATETIME"];
-            song_object.set_string_member("creation_datetime", SqliteUtils.sqldate_to_jsondate(creation_datetime));
-                        
-            song_array.add_object_element(song_object);
+        foreach (Song song in songs) {
+            song_array.add_object_element(song_metadata_object(song));
         }
-        root_object.set_array_member("songs", song_array);
-        songs_json.init_object(root_object);
-        return songs_json;
+        return song_array;
     }
 
-    public static Json.Node make_albums(Gee.List<AlbumDataEx> album_list, GenreData? genre, ArtistData? artist, Soup.Message msg) {
-        Json.Node albums_json = new Json.Node(OBJECT);
-        Json.Object root_object = new Json.Object();
-        if (genre != null) {
-            root_object.set_int_member("genre_id", genre.id);
-            root_object.set_string_member("genre_name", genre.name);
+    public Json.Array artwork_array(Gee.List<Artwork> artworks) throws OnnojiError {
+        Json.Array artwork_array = new Json.Array();
+        foreach (Artwork artwork in artworks) {
+            artwork_array.add_string_element(OnnojiPaths.artwork_url(artwork.artwork_id));
         }
-        if (artist != null) {
-            root_object.set_int_member("artist_id", artist.id);
-            root_object.set_string_member("artist_name", artist.name);
-        }
-        Json.Array album_array = new Json.Array();
-        for (int i = 0; i < album_list.size; i++) {
-            Json.Object album_object = new Json.Object();
-            album_object.set_string_member("album_id", album_list[i].id.substring(0, ID_LENGTH));
-            album_object.set_string_member("album_name", album_list[i].name);
-            Json.Array artist_array = new Json.Array();
-            for (int j = 0; j < album_list[i].artists.size; j++) {
-                Json.Object artist_object = new Json.Object();
-                artist_object.set_int_member("artist_id", album_list[i].artists[j].id);
-                artist_object.set_string_member("artist_name", album_list[i].artists[j].name);
-                artist_array.add_object_element(artist_object);
-            }
-            album_object.set_array_member("artists", artist_array);
-            if (album_list[i].has_artwork) {
-                album_object.set_string_member("album_artwork",
-                        OnnojiUtils.make_artwork_url(msg.uri, album_list[i].first_artwork_file_path));
-            } else {
-                album_object.set_null_member("album_artwork");
-            }
-            if (album_list[i].creation_datetime != null) {
-                album_object.set_string_member("creation_datetime", album_list[i].creation_datetime.format_iso8601());
-            } else {
-                album_object.set_null_member("creation_datetime");
-            }
-            if (album_list[i].last_request_datetime != null) {
-                album_object.set_string_member("last_request_datetime", album_list[i].last_request_datetime.format_iso8601());
-            } else {
-                album_object.set_null_member("last_request_datetime");
-            }
-            album_array.add_object_element(album_object);
-        }
-        root_object.set_array_member("albums", album_array);
-        albums_json.set_object(root_object);
-        return albums_json;
+        return artwork_array;
     }
 
-    public static Json.Node make_artists(Gee.List<ArtistData> artist_list, GenreData? genre, AlbumData? album) {
-        Json.Node artists_json = new Json.Node(OBJECT);
-        Json.Object root_object = new Json.Object();
-        Json.Array artist_array = new Json.Array();
-        if (genre != null) {
-            root_object.set_int_member("genre_id", genre.id);
-            root_object.set_string_member("genre_name", genre.name);
+    public Json.Object playlist_object(Playlist playlist) {
+        Json.Object obj = new Json.Object();
+        if (playlist.is_album) {
+            obj.set_int_member("albumId", playlist.playlist_id);
+            obj.set_string_member("albumName", playlist.playlist_name);
+        } else {
+            obj.set_int_member("playlistId", playlist.playlist_id);
+            obj.set_string_member("playlistName", playlist.playlist_name);
         }
-        if (album != null) {
-            root_object.set_string_member("album_id", album.id);
-            root_object.set_string_member("album_name", album.name);
-        }
-        for (int i = 0; i < artist_list.size; i++) {
-            Json.Object artist_object = new Json.Object();
-            artist_object.set_int_member("artist_id", artist_list[i].id);
-            artist_object.set_string_member("artist_name", artist_list[i].name);
-            artist_array.add_object_element(artist_object);
-        }
-        root_object.set_array_member("artists", artist_array);
-        artists_json.set_object(root_object);
-        return artists_json;
+        obj.set_boolean_member("isAlbum", playlist.is_album);
+        obj.set_string_member("creationDatetime", format_gda_timestamp(playlist.creation_datetime, "%Y-%m-%d %H:%M:%S"));
+        obj.set_string_member("updateDatetime", format_gda_timestamp(playlist.update_datetime, "%Y-%m-%d %H:%M:%S"));
+        obj.set_string_member("artworks", OnnojiPaths.playlist_artworks_url(playlist.playlist_id));
+        obj.set_string_member("artists", OnnojiPaths.playlist_artists_url(playlist.playlist_id));
+        obj.set_string_member("genres", OnnojiPaths.playlist_genres_url(playlist.playlist_id));
+        obj.set_string_member("songs", OnnojiPaths.playlist_songs_url(playlist.playlist_id));
+        return obj;
     }
     
-    public static Json.Node make_genres(Gee.List<GenreData> genre_list, Soup.Message msg) {
-        Json.Node genres_json = new Json.Node(OBJECT);
-        Json.Object root_object = new Json.Object();
-        Json.Array genre_array = new Json.Array();
-        for (int i = 0; i < genre_list.size; i++) {
-            Json.Object genre_object = new Json.Object();
-            genre_object.set_int_member("genre_id", genre_list[i].id);
-            genre_object.set_string_member("genre_name", genre_list[i].name);
-            genre_object.set_string_member("icon", OnnojiUtils.make_genre_icon_url(msg.uri, genre_list[i].id));
-            genre_array.add_object_element(genre_object);
+    public Json.Array playlist_array(Gee.List<Playlist> playlists) {
+        Json.Array playlist_array = new Json.Array();
+        foreach (Playlist playlist in playlists) {
+            playlist_array.add_object_element(playlist_object(playlist));
         }
-        root_object.set_array_member("genres", genre_array);
-        genres_json.set_object(root_object);
-        return genres_json;
+        return playlist_array;
+    }
+
+    public Json.Object artist_object(Artist artist) {
+        Json.Object obj = new Json.Object();
+        obj.set_int_member("artistId", artist.artist_id);
+        obj.set_string_member("artistName", artist.artist_name);
+        obj.set_string_member("albums", OnnojiPaths.artist_albums_url(artist.artist_id));
+        obj.set_string_member("songs", OnnojiPaths.artist_songs_url(artist.artist_id));
+        obj.set_string_member("genres", OnnojiPaths.artist_genres_url(artist.artist_id));
+        return obj;
+    }
+    
+    public Json.Array artist_array(Gee.List<Artist> artists) {
+        Json.Array array = new Json.Array();
+        foreach (Artist artist in artists) {
+            array.add_object_element(artist_object(artist));
+        }
+        return array;
+    }
+
+    public Json.Object genre_object(Genre genre) {
+        Json.Object obj = new Json.Object();
+        obj.set_int_member("genreId", genre.genre_id);
+        obj.set_string_member("genreName", genre.genre_name);
+        obj.set_string_member("icon", OnnojiPaths.genre_icon_url(genre.genre_id));
+        obj.set_string_member("albums", OnnojiPaths.genre_albums_url(genre.genre_id));
+        obj.set_string_member("playlists", OnnojiPaths.genre_playlists_url(genre.genre_id));
+        obj.set_string_member("artists", OnnojiPaths.genre_artists_url(genre.genre_id));
+        return obj;
+    }
+    
+    public Json.Array genre_array(Gee.List<Genre> genre_list) {
+        Json.Array genre_array = new Json.Array();
+        foreach (Genre genre in genre_list) {
+            genre_array.add_object_element(genre_object(genre));
+        }
+        return genre_array;
+    }
+    
+    public Json.Object success_object(string? message = null) {
+        Json.Object obj = new Json.Object();
+        obj.set_string_member("status", "success");
+        if (message != null) {
+            obj.set_string_member("message", message);
+        }
+        return obj;
+    }
+
+    public Json.Object failure_object(string? message = null) {
+        Json.Object obj = new Json.Object();
+        obj.set_string_member("status", "failure");
+        if (message != null) {
+            obj.set_string_member("message", message);
+        }
+        return obj;
     }
 }

@@ -33,6 +33,7 @@ namespace Moegi {
             count++;
             pipeline = new Pipeline("metadata-pipeline" + count.to_string());
             uridecoder = ElementFactory.make("uridecodebin", "uridecoder");
+            
             pipeline.add(uridecoder);
             fakesink = ElementFactory.make("fakesink", "sink");
             pipeline.add(fakesink);
@@ -48,15 +49,14 @@ namespace Moegi {
             });
         }
 
-        public SmallTime get_duration() {
+        public uint get_duration_in_milliseconds() {
             int64 time_in_nanoseconds;
             if (pipeline.query_duration(Gst.Format.TIME, out time_in_nanoseconds)) {
-                int time_in_milliseconds = (int) (time_in_nanoseconds / 1000000);
-                SmallTime time = new SmallTime.from_milliseconds(time_in_milliseconds);
-                return time;
+                uint time_in_milliseconds = (uint) (time_in_nanoseconds / 1000000);
+                return time_in_milliseconds;
             } else {
                 stderr.printf("could not query duration\n");
-                return new SmallTime(0);
+                return 0;
             }
         }
 
@@ -71,6 +71,7 @@ namespace Moegi {
                 throw new Moegi.Error.FILE_IS_NOT_AN_AUDIO("File is not an audio file (%s)\n", file_path);
             }
 
+            debug("file_path: %s", "file://" + file_path);
             uridecoder.set("uri", "file://" + file_path);
             pipeline.set_state(State.PAUSED);
             debug("pipeline state: PAUSED");
@@ -112,8 +113,7 @@ namespace Moegi {
                                 if (!terminated) {
                                     uint num = tag_list_each.get_tag_size(tag);
                                     for (uint i = 0; i < num; i++) {
-                                        GLib.Value value;
-                                        value = tag_list_each.get_value_index(tag, i);
+                                        GLib.Value value = tag_list_each.get_value_index(tag, i);
                                         bool response = tag_found(tag, value);
                                         if (!response) {
                                             terminated = true;
@@ -122,8 +122,8 @@ namespace Moegi {
                                     }
                                 }
                             });
-                            GLib.Value duration_value = GLib.Value(typeof(Moegi.SmallTime));
-                            duration_value.set_object(get_duration());
+                            GLib.Value duration_value = GLib.Value(typeof(uint));
+                            duration_value.set_uint(get_duration_in_milliseconds());
                             tag_found("duration", duration_value);
                             return;
 
@@ -134,6 +134,9 @@ namespace Moegi {
                         }
                     }
                 }
+                uint64 duration;
+                uridecoder.query_duration(Gst.Format.TIME, out duration);
+                debug("get duration: %lld", duration);
             } finally {
                 pipeline.set_state(State.NULL);
                 debug("pipeline state: NULL");

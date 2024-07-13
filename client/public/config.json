@@ -1,0 +1,6 @@
+{
+    "title": "~onnoji~",
+    "apiHost": "localhost",
+    "apiPort": 8765,
+    "recentCount": 50
+}

@@ -9,7 +9,23 @@ class BatchTask : Object {
     public bool is_copy_artwork_files { get; construct set; }
     public bool is_recursive { get; set; default = false; }
     public Gee.List<string>? registered_album_ids;
+    public Gda.Connection conn { get; set; }
+    public SongRepository songs_repository { get; set; }
+    public Playlist playlist_repo { get; set; }
+    public GenreRepository genre_repo;
+    public Artist artist_repo;
+    public HistoryRepository history_repo;
+    public RelationRepository relation_repo;
+    public ArtworkRepository artwork_repo;
 
+    public BatchTack(SongRepository song_repo, PlaylistRepository playlist_repo, ArtistRepository artist_repo,
+            GenreRepository genre_repo) {
+        this.song_repo = song_repo;
+        this.playlist_repo = playlist_repo;
+        this.artist_repo = artist_repo;
+        this.genre_repo = genre_repo;
+    }
+    
     private void init_registered_album_ids() {
         registered_album_ids = new Gee.ArrayList<string>();
     }
@@ -29,10 +45,6 @@ class BatchTask : Object {
     }
     
     public int execute(Gee.List<string> file_paths) throws OnnojiError {
-        int ec = Sqlite.Database.open(database_path, out db);
-        if (ec != Sqlite.OK) {
-            return 5;
-        }
         foreach (string file_path in file_paths) {
             File file = File.new_for_path(file_path);
             if (!file.query_exists()) {
@@ -49,17 +61,15 @@ class BatchTask : Object {
     
     private int execute_file(File file) throws OnnojiError {
         Moegi.FileInfo? music_info = read_music_info(file);
-        string? album_id_name = file.get_parent().get_basename();
-        string? album_id = null;
-        Albums albums = new Albums(db);
+        int playlist_id;
         do {
-            album_id = calc_album_id(album_id_name);
-            if (!is_registered_at_same_time(album_id) && albums.album_exists(album_id)) {
-                print(@"The album named \"$(music_info.dir)\" exists. Do you rename it?[y/n]: ");
+            playlist_id = playlist_repo.get_next_id();
+            if (!is_registered_at_same_time(playlist_id) && playlist_repo.playlist_exists(playlist_id)) {
+                print(@"The playlist named \"$(music_info.dir)\" exists. Do you rename it?[y/n]: ");
                 string? answer = stdin.read_line();
                 if (answer != null && answer == "y") {
-                    print("Enter the new album_name: ");
-                    album_id_name = stdin.read_line();
+                    print("Enter the new playlist_name: ");
+                    playlist_id_name = stdin.read_line();
                 } else {
                     print("This registration was cancelled\n");
                     return 1;
@@ -68,15 +78,15 @@ class BatchTask : Object {
                 break;
             }
         } while (true);
-        music_info.dir = album_id_name;
-        add_album_id(album_id);
+        music_info.dir = playlist_id_name;
+        add_playlist_id(playlist_id);
         if (music_info != null && music_info.type == Moegi.FileType.MUSIC) {
             print("execute file \"%s\"\n", file.get_path());
             string md5sum = calc_md5sum(file);
             print("  md5sum: %s\n", md5sum);
             print("  music info: %s\n", music_info.to_string());
             Songs songs = new Songs(db);
-            bool is_found = songs.song_exists(md5sum);
+            bool is_found = song_repo.song_exists(md5sum);
             if (!is_found) {
                 print("  Register mode\n");
                 File? artwork_file = null;
@@ -91,7 +101,7 @@ class BatchTask : Object {
                     print("  Song file was saved\n");
                 }
                 try {
-                    register_song_data(md5sum, music_info, song_file.get_path(),
+                    register_song(md5sum, music_info, song_file.get_path(),
                             artwork_file != null ? artwork_file.get_path() : null);
                     print("  Song data was registered\n");
                     return 0;
@@ -189,9 +199,9 @@ class BatchTask : Object {
         return checksum.get_string();
     }
 
-    public void register_song_data(string md5sum, Moegi.FileInfo music_info, string song_file_path,
+    public void register_song(string md5sum, Moegi.FileInfo music_info, string song_file_path,
             string? artwork_file_path) throws OnnojiError {
-        SongData data = new SongData();
+        Song data = new Song();
         data.song_id = md5sum;
         data.title = music_info.title == null || music_info.title == "" ? music_info.name : music_info.title;
         
@@ -200,11 +210,11 @@ class BatchTask : Object {
             
             int artist_id = artists.find_artist_id(music_info.artist);
             if (artist_id <= 0) {
-                ArtistData artist_data = new ArtistData();
-                artist_data.id = artists.find_max_artist_id() + 1;
-                artist_data.name = music_info.artist;
-                artists.register(artist_data);
-                artist_id = artist_data.id;
+                Artist artist = new Artist();
+                artist.artist_id = artists.find_max_artist_id() + 1;
+                artist.artist_name = music_info.artist;
+                artist_repo.insert(artist);
+                artist_id = artist.artist_id;
             }
             data.artist_id = artist_id;
         }
@@ -214,31 +224,29 @@ class BatchTask : Object {
 
             int genre_id = genres.find_genre_id(music_info.genre);
             if (genre_id <= 0) {
-                GenreData genre_data = new GenreData();
-                genre_data.id = genres.find_max_genre_id() + 1;
-                genre_data.name = music_info.genre;
-                genres.register(genre_data);
-                genre_id = genre_data.id;
+                Genre genre = new Genre();
+                genre.genre_id = genres.find_max_genre_id() + 1;
+                genre.genre_name = music_info.genre;
+                genre_repo.insert(genre);
+                genre_id = genre.genre_id;
             }
             data.genre_id = genre_id;
         }
         
-        Albums albums = new Albums(db);
-
-        string album_id = calc_album_id(music_info.dir);
-        if (!albums.album_exists(album_id)) {
-            AlbumData album_data = new AlbumData();
-            album_data.id = album_id;
-            if (music_info.album != null) {
-                album_data.name = music_info.album;
+        string playlist_id = calc_playlist_id(music_info.dir);
+        if (!playlist_repo.playlist_exists(playlist_id)) {
+            Playlist playlist = new Playlist();
+            playlist.id = playlist_id;
+            if (music_info.playlist != null) {
+                playlist.name = music_info.playlist;
             } else {
                 File dir_file = File.new_for_path(music_info.dir);
-                album_data.name = dir_file.get_basename();
+                playlist.name = dir_file.get_basename();
             }
-            album_data.id_name = music_info.dir;
-            albums.register(album_data);
+            playlist.id_name = music_info.dir;
+            playlist_repo.insert(playlist);
         }
-        data.album_id = album_id;
+        data.playlist_id = playlist_id;
         
         data.disc_number = (int) music_info.disc_number;
         data.track_number = (int) music_info.track;
@@ -251,12 +259,11 @@ class BatchTask : Object {
         data.artwork_file_path = artwork_file_path;
         data.creation_datetime = new DateTime.now_local();
         
-        Songs songs = new Songs(db);
-        songs.register(data);
+        song_repo.insert(data);
     }
     
-    private string calc_album_id(string album_dir) {
-        return Checksum.compute_for_string(ChecksumType.MD5, album_dir, album_dir.length);
+    private string calc_playlist_id(string playlist_dir) {
+        return Checksum.compute_for_string(ChecksumType.MD5, playlist_dir, playlist_dir.length);
     }
     
     private File? save_artwork_file(string song_id, Gdk.Pixbuf artwork) throws OnnojiError {

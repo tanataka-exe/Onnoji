@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/local/asusturn/onnoji">
+    <file>main/application.properties</file>
+    <file preprocess="xml-stripblanks">sql/repository.xml</file>
+    <file preprocess="xml-stripblanks">main/html-resources.xml</file>
+    <file>images/empty-image200.png</file>
+    <file>images/empty-image48.png</file>
+  </gresource>
+</gresources>
+

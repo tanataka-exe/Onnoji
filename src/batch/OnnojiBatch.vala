@@ -2,21 +2,25 @@ using Moegi;
 
 class OnnojiBatch : Application {
     private string database_path;
-    private Sqlite.Database db;
+    private Gda.Connection conn;
+    
 
     private bool is_copy_song_files;
     private bool is_copy_artwork_files;
     private Gee.List<string> file_paths;
     
+    private ApplicationContext context;
+    
     public OnnojiBatch() {
         Object(
-            application_id: "com.github.aharotias.music-server-batch",
+            application_id: "com.github.aharotias.onnoji-batch",
             flags: ApplicationFlags.HANDLES_COMMAND_LINE
         );
     }
     
     public override void activate() {
         hold();
+        context = RealApplicationContext.get_instance();
         release();
     }
     
@@ -42,14 +46,11 @@ class OnnojiBatch : Application {
             return 1;
         }
         read_options(args);
-        BatchTask task = new BatchTask() {
-            song_dir_path = "/srv/music/data/songs",
-            artwork_dir_path = "/srv/music/data/artworks",
-            database_path = "/srv/music/data/music.db",
-            is_copy_song_files = is_copy_song_files,
-            is_copy_artwork_files = is_copy_artwork_files,
-            is_recursive = true
-        };
+        BatchTask task = context.get_batch_task();
+        task.is_copy_song_files = is_copy_song_files;
+        task.is_copy_artwork_files = is_copy_artwork_files;
+        task.is_recursive = true;
+        
         int result = 0;
         try {
             result = task.execute(file_paths);
@@ -64,7 +65,8 @@ class OnnojiBatch : Application {
     public static int main(string[] args) {
         set_print_handler((text) => stdout.puts(text));
         Gst.init(ref args);
-        OnnojiBatch batch_app = new OnnojiBatch();
+        ApplicationContext context = RealApplicationContext.get_instance();
+        OnnojiBatch batch_app = context.get_onnoji_batch();
         int status = batch_app.run(args);
         return status;
     }

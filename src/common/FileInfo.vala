@@ -33,7 +33,7 @@ namespace Moegi {
         public uint track;
         public uint track_count;
         public uint date;
-        public SmallTime time_length;
+        public uint time_length_milliseconds;
         public Moegi.FileType type;
         public Gdk.Pixbuf? artwork;
         public string mime_type;
@@ -54,7 +54,7 @@ namespace Moegi {
             cp.track = this.track;
             cp.track_count = this.track_count;
             cp.date = this.date;
-            cp.time_length = this.time_length;
+            cp.time_length_milliseconds = this.time_length_milliseconds;
             cp.type = this.type;
             cp.artwork = this.artwork;
             cp.mime_type = this.mime_type;
@@ -123,12 +123,7 @@ namespace Moegi {
             sb.append(", \"track\" : ").append(track.to_string());
             sb.append(", \"track_count\" : ").append(track.to_string());
             sb.append(", \"date\" : ").append(date.to_string());
-            sb.append(", \"time_length\" : ");
-            if (time_length != null) {
-                sb.append("\"").append(time_length.to_string()).append("\"");
-            } else {
-                sb.append(empty);
-            }
+            sb.append(", \"time_length_milliseconds\" : ").append(time_length_milliseconds.to_string());;
             sb.append(", \"mime_type\" : \"").append(mime_type).append("\"");
             sb.append(", \"type\" : \"").append(type.get_name()).append("\" }");
             return sb.str;
