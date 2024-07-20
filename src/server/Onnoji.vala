@@ -1,12 +1,28 @@
 public class Onnoji : GLib.Object {
 
+    private static int thread_count = 0;
+    
     public static async void handle_music_request_async(OnnojiThreadData thread_data) throws GLib.Error {
         thread_data.completed.connect(() => {
             Idle.add(handle_music_request_async.callback);
         });
+        if (thread_count > 100) {
+            Timeout.add(100, () => {
+                if (thread_count > 100) {
+                    return Source.CONTINUE;
+                } else {
+                    handle_music_request_async.callback();
+                    return Source.REMOVE;
+                }
+            });
+            yield;
+        }
+        thread_count++;
+        debug("The current number of threads is %d\n", thread_count);
         Thread<uint> thread = new Thread<uint>.try(null, thread_data.run);
         yield;
         thread.join();
+        thread_count--;
     }
 
     public static int main(string[] args) {
