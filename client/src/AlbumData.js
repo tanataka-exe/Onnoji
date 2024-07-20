@@ -83,7 +83,7 @@ export default function AlbumData({ album, linkArtist }) {
                 `http://${appConfig?.apiHost}:${appConfig?.apiPort}/api/v2/playlist/${album.albumId}/artworks`
             );
             const artworksJson = await artworksResponse.json();
-            setArtwork(artworksJson.artworks[0]);
+            setArtwork(`${appConfig?.apiHost}:${appConfig?.apiPort}${artworksJson.artworks[0]}`);
         };
         fetchData();
     }, [album, appConfig, appState]);

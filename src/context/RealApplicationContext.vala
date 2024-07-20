@@ -114,7 +114,7 @@ public class RealApplicationContext : ApplicationContext, Object {
         server.listen_all(port, 0);
         return server;
     }
-    
+
     public OnnojiThreadData get_onnoji_thread_data() throws Error {
         return new OnnojiThreadData() {
             producer = get_music_data_producer()
