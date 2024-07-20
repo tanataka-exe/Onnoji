@@ -20,24 +20,30 @@ public class PlaylistRepositoryImpl : PlaylistRepository, BasicRepositoryImpl {
     public Gee.List<Playlist> select_by_id(int playlist_id, SqlConditionType cond_type = EQUALS) throws Error {
         string sql;
         string param_name;
-        switch (cond_type) {
-          case STARTS_WITH:
-            sql = res.get_string_with_params("playlist-select-by-id", "playlist-id-starts-with");
-            param_name = "starts_with_playlist_id";
-            break;
-          case ENDS_WITH:
-            sql = res.get_string_with_params("playlist-select-by-id", "playlist-id-ends-with");
-            param_name = "ends_with_playlist_id";
-            break;
-          case INCLUDES:
-            sql = res.get_string_with_params("playlist-select-by-id", "playlist-id-includes");
-            param_name = "includes_playlist_id";
-            break;
-          case EQUALS:
-          default:
-            sql = res.get_string_with_params("playlist-select-by-id", "playlist-id-equals");
-            param_name = "equals_playlist_id";
-            break;
+        if (EQUALS in cond_type) {
+            if (GREATER_THAN in cond_type) {
+                sql = res.get_string_with_params("playlist-select-by-id", "playlist-id-ge");
+                param_name = "ge_playlist_id";
+                debug("playlist select ge");
+            } else if (LESS_THAN in cond_type) {
+                sql = res.get_string_with_params("playlist-select-by-id", "playlist-id-le");
+                param_name = "le_playlist_id";
+                debug("playlist select le");
+            } else {
+                sql = res.get_string_with_params("playlist-select-by-id", "playlist-id-equals");
+                param_name = "equals_playlist_id";
+                debug("playlist select equals");
+            }
+        } else if (GREATER_THAN in cond_type) {
+            sql = res.get_string_with_params("playlist-select-by-id", "playlist-id-gt");
+            param_name = "gt_playlist_id";
+            debug("playlist select gt");
+        } else if (LESS_THAN in cond_type) {
+            sql = res.get_string_with_params("playlist-select-by-id", "playlist-id-lt");
+            param_name = "lt_playlist_id";
+            debug("playlist select lt");
+        } else {
+            throw new OnnojiError.SQL_ERROR("This condition is not selectable");
         }
         debug(sql);
         return fetch_playlists(sql, param_name, Values.of_int(playlist_id));

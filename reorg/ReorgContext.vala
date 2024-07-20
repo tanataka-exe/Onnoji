@@ -1,6 +1,6 @@
-public class RealApplicationContext : ApplicationContext, Object {
+public class ReorgContext : Object {
 
-    private static RealApplicationContext? instance;
+    private static ReorgContext? instance;
     
     private Gda.Connection? conn;
     private SongRepository song_repo;
@@ -12,11 +12,11 @@ public class RealApplicationContext : ApplicationContext, Object {
     private ResourceManager? resource;
     private XmlResourceManager? xml_resource;
 
-    private RealApplicationContext() {}
+    private ReorgContext() {}
     
-    public static RealApplicationContext get_instance() {
+    public static ReorgContext get_instance() {
         if (instance == null) {
-            instance = new RealApplicationContext();
+            instance = new ReorgContext();
         }
         return instance;
     }
@@ -38,9 +38,9 @@ public class RealApplicationContext : ApplicationContext, Object {
     public Gda.Connection get_gda_connection() throws Error {
         if (this.conn == null) {
             this.conn = Gda.Connection.open_from_string(
-                get_resource_manager().get_string("db.provider"),
-                get_resource_manager().get_string("db.cns"),
-                get_resource_manager().get_string("db.auth"), 0
+                get_resource_manager().get_string("reorg.db.provider"),
+                get_resource_manager().get_string("reorg.db.cns"),
+                get_resource_manager().get_string("reorg.db.auth"), 0
             );
         } else if (!this.conn.is_opened()) {
             this.conn.open();
@@ -108,19 +108,6 @@ public class RealApplicationContext : ApplicationContext, Object {
         return history_repo;
     }
     
-    public Soup.Server get_server() throws Error {
-        int port = 8765;
-        Soup.Server server = new Soup.Server("server-header", null);
-        server.listen_all(port, 0);
-        return server;
-    }
-    
-    public OnnojiThreadData get_onnoji_thread_data() throws Error {
-        return new OnnojiThreadData() {
-            producer = get_music_data_producer()
-        };
-    }
-
     public Moegi.MetadataReader get_moegi_metadata_reader() {
         return new Moegi.MetadataReader();
     }
@@ -129,49 +116,7 @@ public class RealApplicationContext : ApplicationContext, Object {
         return new Moegi.FileInfoAdapter(get_moegi_metadata_reader());
     }
     
-    public MusicDataProducer get_music_data_producer() throws Error {
-        return new MusicDataProducerImpl1() {
-            song_repo = get_song_repository(),
-            genre_repo = get_genre_repository(),
-            artist_repo = get_artist_repository(),
-            playlist_repo = get_playlist_repository(),
-            history_repo = get_history_repository(),
-            artwork_repo = get_artwork_repository(),
-            json_maker = get_response_json_maker(),
-            file_adapter = get_moegi_file_info_adapter(),
-            artwork_base_path = get_resource_manager().get_string("test.server.path.artwork"),
-            song_base_path = get_resource_manager().get_string("test.server.path.song"),
-            genre_default_icon_path = get_resource_manager().get_string("test.server.path.genre-default-icon"),
-            artwork_default_resource_uri = "/local/asusturn/onnoji/images/empty-image200.png"
-        };
-    }
-    
-    /*
-    public OnnojiBatch get_onnoji_batch() {
-        return new OnnojiBatch();
-    }
-    
-    public BatchTask get_batch_task() {
-        return new BatchTask() {
-            song_dir_path = get_resource_manager().get_string("server.path.song"),
-            artwork_dir_path = get_resource_manager().get_string("server.path.artworks"),
-            database_path = get_resource_manager().get_string("server.path.database"),
-            conn = get_gda_connection(),
-            song_repo = get_song_repository(),
-            genre_repo = get_genre_repository(),
-            artist_repo = get_artist_repository(),
-            playlist_repo = get_playlist_repository(),
-            history_repo = get_history_repository(),
-            relation_repo = get_relation_repository()
-        };
-    }
-    */
-    
-    public ResponseJsonMaker get_response_json_maker() throws Error {
-        return new ResponseJsonMaker();
-    }
-    
-    public void finalize() throws Error {
+    public void finalization() throws Error {
         conn.close();
         debug("connection was closed");
     }

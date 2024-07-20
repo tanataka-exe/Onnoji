@@ -137,6 +137,11 @@ common_test_sources = files([
   'tests/common-tests.vala'
 ])
 
+reorg_sources = files([
+  'reorg/reorg.vala',
+  'reorg/ReorgContext.vala'
+])
+
 #executable('onnoji', server_sources, dependencies: dependencies)
 #executable('onnoji-batch', batch_sources, dependencies: dependencies)
 
@@ -145,6 +150,17 @@ common_test_sources = files([
 #  ['tests/test1.vala'] + asresources + repository_sources + test_sources + common_sources + service_sources,
 #  dependencies: dependencies
 #)
+
+reorg = executable(
+  'onnoji-reorg',
+  reorg_sources
+  + asresources
+  + common_sources
+  + gst_utils_sources
+  + repository_sources
+  + resource_sources,
+  dependencies: dependencies
+)
 
 gstreamer_test = executable(
   'onnoji-gstreamer-test',

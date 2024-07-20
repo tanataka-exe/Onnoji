@@ -20,24 +20,30 @@ public class SongRepositoryImpl : SongRepository, BasicRepositoryImpl {
     public Gee.List<Song> select_by_id(int song_id, SqlConditionType cond_type = EQUALS) throws Error {
         string sql;
         string param_name;
-        switch (cond_type) {
-          case STARTS_WITH:
-            sql = res.get_string_with_params("song-select-by-id", "song-id-starts-with");
-            param_name = "starts_with_song_id";
-            break;
-          case ENDS_WITH:
-            sql = res.get_string_with_params("song-select-by-id", "song-id-ends-with");
-            param_name = "ends_with_song_id";
-            break;
-          case INCLUDES:
-            sql = res.get_string_with_params("song-select-by-id", "song-id-includes");
-            param_name = "includes_song_id";
-            break;
-          case EQUALS:
-          default:
-            sql = res.get_string_with_params("song-select-by-id", "song-id-equals");
-            param_name = "equals_song_id";
-            break;
+        if (EQUALS in cond_type) {
+            if (GREATER_THAN in cond_type) {
+                sql = res.get_string_with_params("song-select-by-id", "song-id-ge");
+                param_name = "ge_song_id";
+                debug("song select ge");
+            } else if (LESS_THAN in cond_type) {
+                sql = res.get_string_with_params("song-select-by-id", "song-id-le");
+                param_name = "le_song_id";
+                debug("song select le");
+            } else {
+                sql = res.get_string_with_params("song-select-by-id", "song-id-equals");
+                param_name = "equals_song_id";
+                debug("song select equals");
+            }
+        } else if (GREATER_THAN in cond_type) {
+            sql = res.get_string_with_params("song-select-by-id", "song-id-gt");
+            param_name = "gt_song_id";
+            debug("song select gt");
+        } else if (LESS_THAN in cond_type) {
+            sql = res.get_string_with_params("song-select-by-id", "song-id-lt");
+            param_name = "lt_song_id";
+            debug("song select lt");
+        } else {
+            throw new OnnojiError.SQL_ERROR("This condition is not selectable");
         }
         debug(sql);
         return fetch_songs(sql, param_name, Values.of_int(song_id));
