@@ -58,6 +58,8 @@ public class Onnoji : GLib.Object {
                 thread_data.path = path;
                 thread_data.query = query;
                 thread_data.client = client;
+                thread_data.run();
+                /*
                 handle_music_request_async.begin(thread_data, (res, obj) => {
                     try {
                         handle_music_request_async.end(obj);
@@ -67,6 +69,7 @@ public class Onnoji : GLib.Object {
                     }
                 });
                 server.pause_message(msg);
+                */
             });
             
             // handle other requests
