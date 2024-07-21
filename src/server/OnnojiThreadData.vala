@@ -17,7 +17,8 @@ public class OnnojiThreadData : Object {
     public GLib.HashTable<string, string>? query { get; set; }
     public Soup.ClientContext client { get; set; }
     public MusicDataProducer producer { get; construct set; }
-    public Mutex* mutex;
+    public string access_control_allow_origin { get; construct set; }
+    public static Mutex mutex = Mutex();
     
     /*
      * signals
@@ -337,7 +338,7 @@ public class OnnojiThreadData : Object {
             msg.status_code = 500;
         }
 
-        msg.response_headers.append("Access-Control-Allow-Origin", "http://localhost:3000");
+        msg.response_headers.append("Access-Control-Allow-Origin", access_control_allow_origin);
 
         completed();
         return msg.status_code;
@@ -366,9 +367,9 @@ public class OnnojiThreadData : Object {
             return;
         }
 
-        mutex->lock();
+        mutex.lock();
         var res = producer.query_song_stream(song_id);
-        mutex->unlock();
+        mutex.unlock();
         set_service_response(200, res);
     }
     
@@ -412,9 +413,9 @@ public class OnnojiThreadData : Object {
             return;
         }
 
-        mutex->lock();
+        mutex.lock();
         var res = producer.query_song_artwork(song_id);
-        mutex->unlock();
+        mutex.unlock();
         if (res != null) {
             set_service_response(200, res);
         } else {
@@ -471,14 +472,14 @@ public class OnnojiThreadData : Object {
 
         if (artwork_id == 0) {
             debug("query artwork default");
-            mutex->lock();
+            mutex.lock();
             var res = producer.query_artwork_default();
-            mutex->unlock();
+            mutex.unlock();
             set_service_response(200, res);
         } else {
-            mutex->lock();
+            mutex.lock();
             var res = producer.query_artwork(artwork_id);
-            mutex->unlock();
+            mutex.unlock();
             if (res != null) {
                 set_service_response(200, res);;
             } else {
@@ -773,9 +774,9 @@ public class OnnojiThreadData : Object {
             return;
         }
 
-        mutex->lock();
+        mutex.lock();
         var res = producer.query_genre_icon(genre_id);
-        mutex->unlock();
+        mutex.unlock();
         set_service_response(200, res);
     }
 

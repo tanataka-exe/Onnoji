@@ -49,10 +49,6 @@ public class Onnoji : GLib.Object {
             
             Soup.Server server = context.get_server();
             
-            // Use Mutex to keep file discriptors safe
-            
-            Mutex mutex = Mutex();
-            
             // handle music request
             
             server.add_handler("/api", (server, msg, path, query, client) => {
@@ -62,7 +58,6 @@ public class Onnoji : GLib.Object {
                 thread_data.path = path;
                 thread_data.query = query;
                 thread_data.client = client;
-                thread_data.mutex = &mutex;
                 handle_music_request_async.begin(thread_data, (res, obj) => {
                     try {
                         handle_music_request_async.end(obj);

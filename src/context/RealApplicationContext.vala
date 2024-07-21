@@ -117,7 +117,8 @@ public class RealApplicationContext : ApplicationContext, Object {
 
     public OnnojiThreadData get_onnoji_thread_data() throws Error {
         return new OnnojiThreadData() {
-            producer = get_music_data_producer()
+            producer = get_music_data_producer(),
+            access_control_allow_origin = get_resource_manager().get_string("server.access-control-allow-origin")
         };
     }
 
@@ -139,9 +140,9 @@ public class RealApplicationContext : ApplicationContext, Object {
             artwork_repo = get_artwork_repository(),
             json_maker = get_response_json_maker(),
             file_adapter = get_moegi_file_info_adapter(),
-            artwork_base_path = get_resource_manager().get_string("test.server.path.artwork"),
-            song_base_path = get_resource_manager().get_string("test.server.path.song"),
-            genre_default_icon_path = get_resource_manager().get_string("test.server.path.genre-default-icon"),
+            artwork_base_path = get_resource_manager().get_string("server.path.artwork"),
+            song_base_path = get_resource_manager().get_string("server.path.song"),
+            genre_default_icon_path = get_resource_manager().get_string("server.path.genre-default-icon"),
             artwork_default_resource_uri = "/local/asusturn/onnoji/images/empty-image200.png"
         };
     }
