@@ -184,10 +184,12 @@
       select t1.song_id, title, pub_date, copyright, comment, time_length_milliseconds,
         mime_type, digest, file_path, artwork_id, creation_datetime
       from song t1
-      where t1.song_id in (
-          select t2.song_id from song_playlist t2
-          where t2.<replacement>playlist_id = ##playlist_id::int</replacement>
-        )
+      inner join song_playlist t2
+       on t2.song_id = t1.song_id
+      where
+        t2.<replacement>playlist_id = ##playlist_id::int</replacement>
+      order by
+        t2.disc_number, t2.track_number
     </sql>
     <sql id="song-select-by-artist-id">
       select t1.song_id, title, pub_date, copyright, comment, time_length_milliseconds,

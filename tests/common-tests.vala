@@ -34,6 +34,18 @@ int main(string[] args) {
         } else {
             return 0;
         }
+      case "onnoji-paths-match-path-6":
+        if (!OnnojiPaths.match_path("/api/v2/playlist/1/artworks", "/api/v2/playlist/[playlist_id]/artwork")) {
+            return 0;
+        } else {
+            return 1;
+        }
+      case "onnoji-paths-match-path-7":
+        if (OnnojiPaths.match_path("/api/v2/playlist/1/artworks", "/api/v2/playlist/[playlist_id]/artworks")) {
+            return 0;
+        } else {
+            return 1;
+        }
       default:
         printerr("%s is not implemented test\n", args[1]);
         return 1;

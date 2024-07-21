@@ -79,16 +79,20 @@ export default function AlbumData({ album, linkArtist }) {
             const genresJson = await genresResponse.json();
             setGenres(genresJson.genres);
 
+            /*
             const artworksResponse = await fetch(
                 `http://${appConfig?.apiHost}:${appConfig?.apiPort}/api/v2/playlist/${album.albumId}/artworks`
             );
             const artworksJson = await artworksResponse.json();
 
-            if (artworksJson.length > 0) {
-                setArtwork(`${appConfig?.apiHost}:${appConfig?.apiPort}${artworksJson.artworks[0]}`);
+            if (artworksJson.artworks.length > 0) {
+                setArtwork(`http://${appConfig?.apiHost}:${appConfig?.apiPort}${artworksJson.artworks[0]}`);
             } else {
                 setArtwork(null);
             }
+            */
+
+            setArtwork(`http://${appConfig?.apiHost}:${appConfig?.apiPort}${album.artwork}`);
         };
         fetchData();
     }, [album, appConfig, appState]);

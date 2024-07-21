@@ -13,6 +13,7 @@ public interface MusicDataProducer : Object {
     public abstract ServiceResponse? query_playlist_genres(int playlist_id) throws OnnojiError;
     public abstract ServiceResponse? query_playlist_artists(int playlist_id) throws OnnojiError;
     public abstract ServiceResponse? query_playlist_artworks(int playlist_id) throws OnnojiError;
+    public abstract ServiceResponse? query_playlist_artwork(int playlist_id) throws OnnojiError;
     public abstract ServiceResponse? query_genre_songs(int genre_id) throws OnnojiError;
     public abstract ServiceResponse? register_genre_icon(int genre_id, string genre_icon_file_path) throws OnnojiError;
     public abstract ServiceResponse? query_genre_icon(int genre_id) throws OnnojiError;

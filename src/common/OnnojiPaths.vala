@@ -74,6 +74,10 @@ namespace OnnojiPaths {
         return @"$(api_path)/playlist/$(playlist_id)/artworks";
     }
 
+    public string playlist_artwork_url(int playlist_id) {
+        return @"$(api_path)/playlist/$(playlist_id)/artwork";
+    }
+
     public string genre_icon_file_path(int genre_id) {
         return @"$(server_data_path)/icons/genre/$(genre_id).jpg";
     }

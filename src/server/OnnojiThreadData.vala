@@ -187,6 +187,15 @@ public class OnnojiThreadData : Object {
                     msg.status_code = 405;
                 }
                 
+            } else if (OnnojiPaths.match_path(path, "/api/v2/playlist/[playlist_id]/artwork")
+                    || OnnojiPaths.match_path(path, "/api/v2/album/[album_id]/artwork")) {
+                
+                if (method == METHOD_GET) {
+                    do_get_playlist_artwork(int.parse(path.split("/")[4]));
+                } else {
+                    msg.status_code = 405;
+                }
+                
             } else if (OnnojiPaths.match_path(path, "/api/v2/artist/[artist_id]")) {
                 
                 if (method == METHOD_GET) {
@@ -670,6 +679,24 @@ public class OnnojiThreadData : Object {
         }
 
         var res = producer.query_playlist_artworks(playlist_id);
+        if (res != null) {
+            set_service_response(200, res);
+        } else {
+            msg.set_redirect(303, "/api/v2/artwork/0");
+        }
+    }
+    
+    /**
+     * GET /api/v2/playlist/[playlist_id]/artworks
+     */
+    private void do_get_playlist_artwork(int playlist_id) throws OnnojiError {
+
+        if (!is_playlist_id_valid(playlist_id)) {
+            msg.status_code = 404;
+            return;
+        }
+
+        var res = producer.query_playlist_artwork(playlist_id);
         if (res != null) {
             set_service_response(200, res);
         } else {

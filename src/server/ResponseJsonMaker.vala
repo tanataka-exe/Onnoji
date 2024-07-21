@@ -86,6 +86,7 @@ public class ResponseJsonMaker : Object {
         obj.set_boolean_member("isAlbum", playlist.is_album);
         obj.set_string_member("creationDatetime", format_gda_timestamp(playlist.creation_datetime, "%Y-%m-%d %H:%M:%S"));
         obj.set_string_member("updateDatetime", format_gda_timestamp(playlist.update_datetime, "%Y-%m-%d %H:%M:%S"));
+        obj.set_string_member("artwork", OnnojiPaths.playlist_artwork_url(playlist.playlist_id));
         obj.set_string_member("artworks", OnnojiPaths.playlist_artworks_url(playlist.playlist_id));
         obj.set_string_member("artists", OnnojiPaths.playlist_artists_url(playlist.playlist_id));
         obj.set_string_member("genres", OnnojiPaths.playlist_genres_url(playlist.playlist_id));

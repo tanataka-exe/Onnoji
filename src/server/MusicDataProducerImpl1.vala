@@ -240,6 +240,18 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
+    public ServiceResponse? query_playlist_artwork(int playlist_id) throws OnnojiError {
+        try {
+            Gee.List<Artwork> artworks = artwork_repo.select_by_playlist_id(playlist_id);
+            if (artworks.size == 0) {
+                return query_artwork(0);
+            }
+            return query_artwork(artworks[0].artwork_id);
+        } catch (Error e) {
+            throw new OnnojiError.SQL_ERROR(e.message);
+        }
+    }
+
     public ServiceResponse? query_artists() throws OnnojiError {
         try {
             Gee.List<Artist> artists = artist_repo.select_all();
