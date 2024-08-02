@@ -177,18 +177,16 @@ public class ArtworkRepositoryImpl : ArtworkRepository, BasicRepositoryImpl {
     }
 
     public bool insert(Artwork artwork, SqlInsertFlags flags = 0) throws Error {
-        int num_affected = execute_non_select_with_params(
-            conn.create_parser().parse_string(res.get_string("artwork-insert"), null),
-            "artwork_id", (
-                GENERATE_NEXT_ID in flags ? get_next_artwork_id() : Values.of_int(artwork.artwork_id)
-            ),
-            "artwork_file_path", Values.of_string(artwork.artwork_file_path),
-            "mime_type", Values.of_string(artwork.mime_type),
-            "digest", Values.of_string(artwork.digest)
+        return conn.insert_row_into_table_v(
+            "artwork",
+            slist<string>("artwork_id", "artwork_file_path", "mime_type", "digest"),
+            slist<Value?>(
+                (GENERATE_NEXT_ID in flags ? get_next_artwork_id() : Values.of_int(artwork.artwork_id)),
+                Values.of_string(artwork.artwork_file_path),
+                Values.of_string(artwork.mime_type),
+                Values.of_string(artwork.digest)
+            )
         );
-        if (num_affected != 1) {
-            throw new OnnojiError.SQL_ERROR("More than 1 rows are affected when applying update statement to artwork");
-        }
         return true;
     }
     

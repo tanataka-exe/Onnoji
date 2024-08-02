@@ -126,7 +126,13 @@ public class OnnojiThreadData : Object {
                 
                 if (method == METHOD_GET) {
                     do_get_all_playlists(false);
-                } else if (method == METHOD_POST) {
+                } else {
+                    msg.status_code = 405;
+                }
+                
+            } else if (OnnojiPaths.match_path(path, "/api/v2/playlist")) {
+                
+                if (method == METHOD_POST) {
                     do_post_playlist();
                 } else {
                     msg.status_code = 405;
@@ -136,7 +142,13 @@ public class OnnojiThreadData : Object {
 
                 if (method == METHOD_GET) {
                     do_get_all_playlists(true);
-                } else if (method == METHOD_POST) {
+                } else {
+                    msg.status_code = 405;
+                }
+                
+            } else if (OnnojiPaths.match_path(path, "/api/v2/album")) {
+
+                if (method == METHOD_POST) {
                     do_post_album();
                 } else {
                     msg.status_code = 405;
@@ -556,7 +568,10 @@ public class OnnojiThreadData : Object {
         int part_number = multipart.get_length();
         string? album_title = null;
         string guid = DBus.generate_guid();
+        File tmpDir = File.new_for_path("/tmp/" + guid);
+        tmpDir.make_directory(null);
         Gee.List<PostFileData> file_list = new Gee.ArrayList<PostFileData>();
+        debug("do post request: %d part of multipart message was found!", part_number);
 
         for (int i = 0; i < part_number; i++) {
 
@@ -600,6 +615,8 @@ public class OnnojiThreadData : Object {
                     printerr("ERROR (FileError): %s\n", e.message);
 
                 }
+            } else {
+                debug("unsupported disposition was found: %s", disposition["name"]);
             }
         }
         

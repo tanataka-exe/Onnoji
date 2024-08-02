@@ -3,6 +3,14 @@ import RoundButton from './RoundButton.js';
 import './NaviItem.css';
 import ViewContext from './ViewContext.js';
 
+function NaviItemUploadAlbum(props) {
+    const { viewSwitcher } = useContext(ViewContext);
+    const onClick = () => viewSwitcher.showUploadPage({});
+    return (
+        <RoundButton onClick={onClick} className={props.className}>アップロード</RoundButton>
+    );
+}
+
 function NaviItemGenre(props) {
     const { viewSwitcher } = useContext(ViewContext);
     const onClick = () => viewSwitcher.showGenres();
@@ -97,6 +105,10 @@ export default function NaviItem ({ to, params }) {
 
     if (to === 'recently-requested-albums') {
         return <NaviItemRecentlyRequestedAlbums className={classNameValue}/>;
+    }
+
+    if (to === 'upload-album') {
+        return <NaviItemUploadAlbum className={classNameValue}/>;
     }
 }
 
