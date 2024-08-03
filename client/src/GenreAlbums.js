@@ -36,19 +36,25 @@ export default function GenreAlbums() {
       if (appState.genre != null) {
         console.log('Albums.fetchData(genreId = ' + appState.genre.genreId + ')');
         const response = await fetch(
-          `http://${appConfig?.apiHost}:${appConfig?.apiPort}/api/v2/genre/${appState?.genre.genreId}/albums`
+          `http://${appConfig?.apiHost}:${appConfig?.apiPort}${appState?.genre.albums}`
         );
         if (response.ok) {
           const json = await response.json();
           for (let album of json.albums) {
             const artistRes = await fetch(
-              `http://${appConfig.apiHost}:${appConfig.apiPort}/api/v2/album/${album.albumId}/artists`
+              `http://${appConfig.apiHost}:${appConfig.apiPort}${album.artists}`
             );
             if (artistRes.ok) {
               const artistJson = await artistRes.json();
               album.artists = artistJson.artists;
             } else {
               console.log(await artistRes.text());
+            }
+          }
+          setAlbums(json.albums);
+        } else {
+          console.log(await response.text());
+        }
             }
           }
           setAlbums(json.albums);

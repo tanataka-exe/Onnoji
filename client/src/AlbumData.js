@@ -60,9 +60,14 @@ function AlbumTitle ({children}) {
 
 export default function AlbumData({ album, linkArtist }) {
   const { appState, appConfig, viewSwitcher } = useContext(ViewContext);
-  const [ artists, setArtists ] = useState();
-  const [ genres, setGenres ] = useState();
+  const [ artists, setArtists ] = useState([]);
+  const [ genres, setGenres ] = useState([]);
   const [ artwork, setArtwork ] = useState();
+  const [ songsParam, setSongsParam ] = useState({
+    album: album,
+    genre: appState.genre,
+    artist: appState.artist
+  });
 
   useEffect(() => {
     console.log("get albumData " + JSON.stringify(appState));
@@ -79,30 +84,19 @@ export default function AlbumData({ album, linkArtist }) {
       const genresJson = await genresResponse.json();
       setGenres(genresJson.genres);
 
-      /*
-        const artworksResponse = await fetch(
-        `http://${appConfig?.apiHost}:${appConfig?.apiPort}/api/v2/playlist/${album.albumId}/artworks`
-        );
-        const artworksJson = await artworksResponse.json();
-
-        if (artworksJson.artworks.length > 0) {
-        setArtwork(`http://${appConfig?.apiHost}:${appConfig?.apiPort}${artworksJson.artworks[0]}`);
-        } else {
-        setArtwork(null);
-        }
-      */
-
       setArtwork(`http://${appConfig?.apiHost}:${appConfig?.apiPort}${album.artwork}`);
+
+      const values = {
+        album: album,
+        genre: genresJson.genres.length > 0 ? genresJson.genres[0] : null,
+        artist: artistsJson.artists.length > 0 ? artistsJson.artists[0] : null
+      };
+      console.log('setSongsParam: ' + JSON.stringify(values));
+      setSongsParam(values);
     };
     fetchData();
   }, [album, appConfig, appState]);
 
-  const songsParam = {
-    album: album,
-    genre: appState.genre,
-    artist: appState.artist
-  };
-  
   return (
     <div className="album-list-item">
       <div>
