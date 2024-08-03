@@ -3,7 +3,7 @@ import emptyImage from './images/empty-image200.png';
 import './Albums.css';
 import './AlbumData.css';
 import ViewContext from './ViewContext.js';
-import LinkButton from './LinkButton.js';
+import Button from 'react-bootstrap/Button';
 
 function ArtistLink({ artist }) {
   const { viewSwitcher } = useContext(ViewContext);
@@ -12,9 +12,9 @@ function ArtistLink({ artist }) {
     artist: artist,
   };
   return (
-    <LinkButton onClick={() => viewSwitcher.showAlbums(params)}>
+    <Button variant="link" onClick={() => viewSwitcher.showAlbums(params)}>
       <span className="artist-name">{artist.artistName}</span>
-    </LinkButton>
+    </Button>
   );
 };
 
@@ -106,14 +106,14 @@ export default function AlbumData({ album, linkArtist }) {
   return (
     <div className="album-list-item">
       <div>
-        <LinkButton onClick={() => viewSwitcher.showSongs(songsParam)}>
+        <Button variant="link" onClick={() => viewSwitcher.showSongs(songsParam)}>
           <img className="img-thumbnail" src={artwork ?? emptyImage} alt="album icon"/>
-        </LinkButton>
+        </Button>
       </div>
       <div>
-        <LinkButton onClick={() => viewSwitcher.showSongs(songsParam)}>
+        <Button variant="link" onClick={() => viewSwitcher.showSongs(songsParam)}>
           <AlbumTitle>{album.albumName}</AlbumTitle>
-        </LinkButton>
+        </Button>
         {linkArtist && artists != null ?
          <ArtistList album={album} artists={artists} genre={genres} linkArtist={linkArtist}/>
          : null}

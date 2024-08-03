@@ -8,7 +8,7 @@ import pauseGif from './images/pausing.gif';
 import playButtonPng from './images/play-button.png';
 import pauseButtonPng from './images/pause-button.png';
 import ViewContext from './ViewContext.js';
-import LinkButton from './LinkButton.js';
+import Button from 'react-bootstrap/Button';
 
 function formatTimeLength(timeLengthMillisec) {
   const milliSec = timeLengthMillisec % 1000;
@@ -380,24 +380,24 @@ export default function Songs() {
                   {(!appState.hasOwnProperty('artist') || appState.artist == null)
                    && songData.artists != null
                    && songData.artists.map(artist =>
-                     <LinkButton onClick={() => viewSwitcher.showAlbums({requestType: 'artist-albums', artist: artist})}>
+                     <Button variant="link" onClick={() => viewSwitcher.showAlbums({requestType: 'artist-albums', artist: artist})}>
                        {artist.artistName}
-                     </LinkButton>
+                     </Button>
                    )}
                   {!appState.hasOwnProperty('artist') && appState.artist == null ?
                    <span>{": "}
-                     <LinkButton onClick={() => viewSwitcher.showSongs({album: appState.album})}>
+                     <Button variant="link" onClick={() => viewSwitcher.showSongs({album: appState.album})}>
                        {appState.album.albumName}
-                     </LinkButton>
+                     </Button>
                    </span>
                    : null
                   }
                   {!appState.hasOwnProperty('album')
                    && songData.albums.hasOwnProperty("map")
                    && songData.albums.map((albumData, index) => {
-                     <LinkButton key={albumData.albumId} onCLick={() => viewSwitcher.showSongs({album: albumData})}>
+                     <Button variant="link" key={albumData.albumId} onCLick={() => viewSwitcher.showSongs({album: albumData})}>
                        {albumData.albumName}
-                     </LinkButton>
+                     </Button>
                    })}
                   {<span>
                      {(songData.pubDate != null

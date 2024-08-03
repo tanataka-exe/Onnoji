@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import './Genres.css';
 import ViewContext from './ViewContext.js';
-import LinkButton from './LinkButton.js';
+import Button from 'react-bootstrap/Button';
 
 export default function Genres() {
   const [genres, setGenres] = useState([]);
@@ -41,12 +41,12 @@ export default function Genres() {
           <li key={"genre" + genre.genreId} className="genre-list-item text-center">
             <img className="genre-icon rounded-circle" src={`http://${appConfig.apiHost}:${appConfig.apiPort}${genre.icon}`} width="160px" height="160px" alt="genre icon"/>
             <h3>{genre.genreName}</h3>
-            <LinkButton onClick={() => viewSwitcher.showAlbums({genre})}>
+            <Button variant="link" onClick={() => viewSwitcher.showAlbums({genre})}>
               アルバム一覧を見る
-            </LinkButton>
-            <LinkButton onClick={() => viewSwitcher.showArtists({genre})}>
+            </Button>
+            <Button variant="link" onClick={() => viewSwitcher.showArtists({genre})}>
               アーティスト一覧を見る
-            </LinkButton>
+            </Button>
           </li>
         ))}
       </ul>

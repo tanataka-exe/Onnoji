@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import ViewContext from './ViewContext.js';
-import LinkButton from './LinkButton.js';
+import Button from 'react-bootstrap/Button';
 
 export default function Artists() {
   const { appConfig, appState, viewSwitcher } = useContext(ViewContext);
@@ -39,7 +39,7 @@ export default function Artists() {
             <tr key={artist.artistId} className="artist-list">
               <td className="text-body text-start">{artist.artistName}</td>
               <td className="text-body text-end">
-                <LinkButton key={artist.artistId} onClick={() => viewSwitcher.showAlbums({requestType: 'artist-albums', artist: artist, genre: appState.genre})}>アルバムを見る</LinkButton>
+                <Button variant="link" key={artist.artistId} onClick={() => viewSwitcher.showAlbums({requestType: 'artist-albums', artist: artist, genre: appState.genre})}>アルバムを見る</Button>
               </td>
             </tr>
           ))}
