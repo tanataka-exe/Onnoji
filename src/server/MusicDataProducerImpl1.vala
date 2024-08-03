@@ -131,6 +131,20 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
+    public ServiceResponse? query_song_genres(int song_id) throws OnnojiError {
+        try {
+            Gee.List<Genre>? genres = genre_repo.select_by_song_id(song_id);
+            if (genres.size == 0) {
+                return null;
+            }
+            return new ServiceResponse.for_json(
+                json_maker.named_array_node("genres", json_maker.genre_array(genres))
+            );
+        } catch (Error e) {
+            throw new OnnojiError.SQL_ERROR(e.message);
+        }
+    }
+
     public ServiceResponse? query_song_albums(int song_id) throws OnnojiError {
         try {
             Gee.List<Playlist>? playlists = playlist_repo.select_by_song_id(song_id);

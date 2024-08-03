@@ -62,16 +62,16 @@ export default function Songs() {
   const displayValue = appState.visible.songs ? 'block' : 'none';
   const playedSongs = [];
   const baseUrl = `http://${appConfig?.apiHost}:${appConfig?.apiPort}`;
-  console.log("get songs " + JSON.stringify(appState));
+  console.log("get songs appState: " + JSON.stringify(appState));
 
   useEffect(() => {
     const fetchData = async () =>  {
       if (appState.album != null || appState.artist != null) {
         let url;
         if (appState.album != null) {
-          url = `${baseUrl}/api/v2/playlist/${appState.album.albumId}/songs`;
+          url = `${baseUrl}${appState.album.songs}`;
         } else if (appState.artist != null) {
-          url = `${baseUrl}/api/v2/artist/${appState.artist.artistId}/songs`;
+          url = `${baseUrl}${appState.artist.songs}`;
         } else {
           return;
         }
@@ -92,7 +92,7 @@ export default function Songs() {
                 song.artists = artistJson.artists;
               } catch (err) {
                 console.log(err);
-                song.artists = null;
+                song.artists = [];
               }
             }
             if (appState.artist != null) {
@@ -101,20 +101,26 @@ export default function Songs() {
                 const albumJson = await albumResponse.json();
                 song.albums = albumJson.albums;
               } catch (err) {
-                song.albums = null;
+                song.albums = [];
               }
+            }
+            try {
+              const genresResponse = await fetch(`${baseUrl}${song.genres}`);
+              const genresJson = await genresResponse.json();
+              song.genres = genresJson.genres;
+            } catch (err) {
+              song.genres = [];
             }
           } catch (err) {
             console.log(err);
-            songList[i].artists = null;
+            songList[i].artists = [];
+            songList[i].albums = [];
+            songList[i].genres = [];
           }
         }
-        setSongs(songsJson.songs);
-        console.log("fetched songs " + JSON.stringify(songsJson));
+        setSongs(songList);
         setAudioSrc(`${baseUrl}${songsJson.songs[0].stream}`);
         setMimeType(songsJson.songs[0].mimeType);
-
-        console.log(JSON.stringify(songs));
       }
     };
     fetchData();
@@ -328,11 +334,21 @@ export default function Songs() {
           ? appState.album?.albumName /* + albumDate*/
           : 'アーティスト: ' + appState.artist?.artistName /* + artistDate*/
       }</h2>
-      <p>{
-        appState.album != null
-          ? 'アーティスト: ' + appState.artist?.artistName
-          : appState.album?.albumName /* + albumDate */
-      }</p>
+      {appState.album != null
+       ? <>
+           <span>{'アーティスト: '}
+             <Button variant="link" onClick={() => viewSwitcher.showAlbums({requestType: 'artist-albums', artist: appState.artist})}>
+               {appState.artist?.artistName}
+             </Button>
+           </span>
+           <span>{'ジャンル: '}
+             <Button variant="link" onClick={() => viewSwitcher.showAlbums({genre: appState.genre})}>
+               {appState.genre?.genreName}
+             </Button>
+           </span>
+         </>
+       : <p>{appState.album?.albumName}</p> /* + albumDate */
+      }
       <Artwork src={songs.length > currentIndex
                     ? (songs[currentIndex].artwork != null ?
                        `http://${appConfig.apiHost}:${appConfig.apiPort}${songs[currentIndex].artwork}` : noImagePngLarge)
@@ -363,8 +379,8 @@ export default function Songs() {
           </tr>
         </thead>
         <tbody>
-          {songs.map((songData, index) => (
-            <tr style={tableRowStyle} key={songData.songId}>
+          {songs.map((song, index) => (
+            <tr style={tableRowStyle} key={song.songId}>
               <td className="playingIconColumn p-0 align-middle">
                 <img src={blackPng} className="m-0" width="48px" height="48px" alt="再生"/>
               </td>
@@ -375,39 +391,29 @@ export default function Songs() {
                 </button>
               </td>
               <td className="songTitleColumn text-start">
-                <h4 className="text-body">{songData.title}</h4>
+                <h4 className="text-body">{song.title}</h4>
                 <span className="song-list-artist-name text-body">
-                  {(!appState.hasOwnProperty('artist') || appState.artist == null)
-                   && songData.artists != null
-                   && songData.artists.map(artist =>
+                  {appState.album != null &&
+                   song.artists.map(artist =>
                      <Button variant="link" onClick={() => viewSwitcher.showAlbums({requestType: 'artist-albums', artist: artist})}>
-                       {artist.artistName}
+                       <span className="h6">{artist.artistName}</span>
                      </Button>
                    )}
-                  {!appState.hasOwnProperty('artist') && appState.artist == null ?
-                   <span>{": "}
-                     <Button variant="link" onClick={() => viewSwitcher.showSongs({album: appState.album})}>
-                       {appState.album.albumName}
+                  {song.genres.map((genre) => 
+                     <Button variant="link" key={genre.genreId} onClick={() => viewSwitcher.showAlbums({genre: genre})}>
+                       <span className="h6">{genre.genreName}</span>
                      </Button>
-                   </span>
-                   : null
-                  }
-                  {!appState.hasOwnProperty('album')
-                   && songData.albums.hasOwnProperty("map")
-                   && songData.albums.map((albumData, index) => {
-                     <Button variant="link" key={albumData.albumId} onCLick={() => viewSwitcher.showSongs({album: albumData})}>
+                   )}
+                  {appState.album == null &&
+                   song.albums.map((albumData, index) => 
+                     <Button variant="link" key={albumData.albumId} onClick={() => viewSwitcher.showSongs({album: albumData})}>
                        {albumData.albumName}
                      </Button>
-                   })}
-                  {<span>
-                     {(songData.pubDate != null
-                       && Number(songData.pubDate) > 0) ? ' (' + songData.pubDate + ')' : ''
-                     }
-                   </span>}
+                   )}
                 </span>
               </td>
-              <td className="songTimeColumn text-right align-middle text-body">{formatTimeLength(songData.timeLengthMilliseconds)}</td>
-              <td className="songTypeColumn text-left align-middle text-body">{songData.mimeType}</td>
+              <td className="songTimeColumn text-right align-middle text-body"f>{formatTimeLength(song.timeLengthMilliseconds)}</td>
+              <td className="songTypeColumn text-left align-middle text-body">{song.mimeType}</td>
             </tr>
           ))}
         </tbody>

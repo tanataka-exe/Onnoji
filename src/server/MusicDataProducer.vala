@@ -4,6 +4,7 @@ public interface MusicDataProducer : Object {
     public abstract ServiceResponse? query_artwork_default() throws OnnojiError;
     public abstract ServiceResponse? query_artwork(int artwork_id) throws OnnojiError;
     public abstract ServiceResponse? query_song_artwork(int song_id) throws OnnojiError;
+    public abstract ServiceResponse? query_song_genres(int song_id) throws OnnojiError;
     public abstract ServiceResponse? query_song_artists(int song_id) throws OnnojiError;
     public abstract ServiceResponse? query_song_albums(int song_id) throws OnnojiError;
     public abstract ServiceResponse? query_song_playlists(int song_id) throws OnnojiError;

@@ -47,15 +47,15 @@ namespace OnnojiPaths {
     }
     
     public string artist_songs_url(int artist_id) {
-        return @"$(api_path)/aritst/$(artist_id)/songs";
+        return @"$(api_path)/artist/$(artist_id)/songs";
     }
     
     public string artist_albums_url(int artist_id) {
-        return @"$(api_path)/aritst/$(artist_id)/albums";
+        return @"$(api_path)/artist/$(artist_id)/albums";
     }
 
     public string artist_genres_url(int artist_id) {
-        return @"$(api_path)/aritst/$(artist_id)/genres";
+        return @"$(api_path)/artist/$(artist_id)/genres";
     }
     
     public string playlist_songs_url(int playlist_id) {

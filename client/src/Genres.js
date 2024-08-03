@@ -96,24 +96,22 @@ function GenreItem({genre}) {
   };
   return (
     <>
-      <div>
-        <div style={containerStyle}
-             onMouseEnter={() => uploadButtonRef.current.style.visibility = 'visible'}
-             onMouseLeave={() => uploadButtonRef.current.style.visibility = 'hidden'}>
-          <div style={imgStyle}>
-            <img className="genre-icon rounded-circle" src={iconSrc} width="160px" height="160px" alt="genre icon"/>
-            <h3>{genre.genreName}</h3>
-            <Button variant="link" onClick={() => viewSwitcher.showAlbums({genre})}>
-              アルバム一覧を見る
-            </Button>
-            <Button variant="link" onClick={() => viewSwitcher.showArtists({genre})}>
-              アーティスト一覧を見る
-            </Button>
-          </div>
-          <Button variant="link" style={buttonStyle} onClick={() => setShowDialog(true)}  ref={uploadButtonRef}>
-            <img src={uploadIcon}/>
+      <div style={containerStyle}
+           onMouseEnter={() => uploadButtonRef.current.style.visibility = 'visible'}
+           onMouseLeave={() => uploadButtonRef.current.style.visibility = 'hidden'}>
+        <div style={imgStyle}>
+          <img className="genre-icon rounded-circle" src={iconSrc} width="160px" height="160px" alt="genre icon"/>
+          <h3>{genre.genreName}</h3>
+          <Button variant="link" onClick={() => viewSwitcher.showAlbums({genre})}>
+            アルバム一覧を見る
+          </Button>
+          <Button variant="link" onClick={() => viewSwitcher.showArtists({genre})}>
+            アーティスト一覧を見る
           </Button>
         </div>
+        <Button variant="link" style={buttonStyle} onClick={() => setShowDialog(true)}  ref={uploadButtonRef}>
+          <img src={uploadIcon}/>
+        </Button>
       </div>
       <UploadDialog genre={genre} show={{value: showDialog, set: setShowDialog}} onComplete={() => setIconSrc(refreshIconSrc())}/>
     </>
@@ -147,16 +145,6 @@ export default function Genres() {
   if (appConfig == null) {
     return;
   }
-
-  const fetchData = async () => {
-    const response = await fetch(`http://${appConfig?.apiHost}:${appConfig?.apiPort}/api/v2/genres`);
-    if (response.ok) {
-      const json = await response.json();
-      setGenres(json.genres);
-    } else {
-      console.log(await response.text());
-    }
-  };
   
   return (
     <div style={{display: displayValue}}>

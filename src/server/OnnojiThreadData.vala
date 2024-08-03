@@ -90,6 +90,14 @@ public class OnnojiThreadData : Object {
                     msg.status_code = 405;
                 }
 
+            } else if (OnnojiPaths.match_path(path, "/api/v2/song/[song_id]/genres")) {
+
+                if (method == METHOD_GET) {
+                    do_get_song_genres(int.parse(path.split("/")[4]));
+                } else {
+                    msg.status_code = 405;
+                }
+
             } else if (OnnojiPaths.match_path(path, "/api/v2/song/[song_id]/artists")) {
 
                 if (method == METHOD_GET) {
@@ -450,6 +458,20 @@ public class OnnojiThreadData : Object {
         }
 
         var res = producer.query_song_artists(song_id);
+        set_service_response(200, res);
+    }
+     
+    /**
+     * GET /api/v2/song/[song_id]/genres
+     */
+    private void do_get_song_genres(int song_id) throws OnnojiError {
+
+        if (!is_song_id_valid(song_id)) {
+            msg.status_code = 404;
+            return;
+        }
+
+        var res = producer.query_song_genres(song_id);
         set_service_response(200, res);
     }
      
