@@ -55,12 +55,6 @@ export default function GenreAlbums() {
         } else {
           console.log(await response.text());
         }
-            }
-          }
-          setAlbums(json.albums);
-        } else {
-          console.log(await response.text());
-        }
       }
     };
     fetchData();

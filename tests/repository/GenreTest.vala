@@ -58,7 +58,10 @@ namespace GenreTest {
 
     int test_update(RepositoryTestContext context) throws Error {
         var repo = context.get_genre_repository();
-        bool response = repo.update_by_id(GENRE_ID_0, "改変ジャンル", "/new/path/to/genre/icon");
+        bool response = repo.update_by_id(GENRE_ID_0,
+            slist<string>("改変ジャンル"),
+            slist<Value?>(Values.of_string("/new/path/to/genre/icon"))
+        );
         print("insert status: %s\n", response ? "Success" : "Failure");
         return 0;
     }

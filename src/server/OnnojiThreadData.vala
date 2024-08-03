@@ -520,43 +520,51 @@ public class OnnojiThreadData : Object {
      * POST /api/v2/genre/[genre_id]/icon
      */
     private void do_post_genre_icon(int genre_id) {
-        Soup.Multipart multipart = new Soup.Multipart.from_message(this.msg.request_headers, this.msg.request_body);
-        int part_number = multipart.get_length();
-        string guid = DBus.generate_guid();
-        for (int i = 0; i < part_number; i++) {
-            unowned Soup.MessageHeaders headers;
-            unowned Soup.Buffer buffer;
-            multipart.get_part(i, out headers, out buffer);
-            // ディスポジション (ファイル名など) を取得する。
+        try {
+            Soup.Multipart multipart = new Soup.Multipart.from_message(this.msg.request_headers, this.msg.request_body);
+            int part_number = multipart.get_length();
+            string guid = DBus.generate_guid();
+            for (int i = 0; i < part_number; i++) {
+                unowned Soup.MessageHeaders headers;
+                unowned Soup.Buffer buffer;
+                multipart.get_part(i, out headers, out buffer);
+                // ディスポジション (ファイル名など) を取得する。
 
-            string disposition_str;
-            HashTable<string, string> disposition;
-            headers.get_content_disposition(out disposition_str, out disposition);
+                string disposition_str;
+                HashTable<string, string> disposition;
+                headers.get_content_disposition(out disposition_str, out disposition);
 
-            if (disposition["name"] == "uploaded-file") {
-                HashTable<string, string> part_content_type_attributes;
-                string part_mime_type = headers.get_content_type(out part_content_type_attributes);
-                string part_file_path = "/tmp/" + guid + "/" + disposition["filename"];
-                try {
-                    // マルチパートのボディをファイルに出力する
+                if (disposition["name"] == "uploaded-file") {
+                    HashTable<string, string> part_content_type_attributes;
+                    string part_mime_type = headers.get_content_type(out part_content_type_attributes);
+                    string part_file_dir = "/tmp/" + guid;
+                    string part_file_path = part_file_dir + "/" + disposition["filename"];
+                    File tmp_dir = File.new_for_path(part_file_dir);
+                    if (!tmp_dir.query_exists()) {
+                        tmp_dir.make_directory();
+                    }
+                    try {
+                        // マルチパートのボディをファイルに出力する
 
-                    FileUtils.set_data(part_file_path, buffer.data);
-                    
-                    var res = producer.register_genre_icon(genre_id, part_file_path);
-                    
-                    set_service_response(200, res);
-                    
-                    return;
-                    
-                } catch (FileError e) {
+                        FileUtils.set_data(part_file_path, buffer.data);
 
-                    printerr("ERROR (FileError): %s\n", e.message);
+                        var res = producer.register_genre_icon(genre_id, part_file_path);
 
-                    break;
+                        set_service_response(200, res);
+
+                        return;
+
+                    } catch (FileError e) {
+
+                        printerr("ERROR (FileError): %s\n", e.message);
+
+                        break;
+                    }
                 }
             }
+        } catch (Error e) {
+            printerr("ERROR: %s\n", e.message);
         }
-        
         set_service_response(500, null);
     }
     

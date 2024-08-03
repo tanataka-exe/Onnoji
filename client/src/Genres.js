@@ -5,31 +5,45 @@ import './Genres.css';
 import ViewContext from './ViewContext.js';
 import uploadIcon from './images/genre-upload-icon.png';
 
-async function uploadGenreIcon(genre, iconFile) {
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
+function UploadDialog({genre, show, onComplete}) {
+
   const { appConfig } = useContext(ViewContext);
-  let formData = new FormData();
-  formData.append('uploaded-file', files[0]);
-  const response = await fetch(`http://${appConfig.apiHost}:${appConfig.apiPort}${genre.uploadIcon}`, {
-    method: "POST",
-    body: formData
-  });
-  const json = await response.json();
-  console.log('result of uploading a genre icon: ' + JSON.stringify(json));
-}
+  const [ file, setFile ] = useState(null);
 
-function UploadDialog({show}) {
-
-  const [ files, setFiles ] = useState([]);
+  async function uploadGenreIcon(iconFile) {
+    let formData = new FormData();
+    if (file == null) {
+      alert("ファイルを選択してから実行してください");
+      return false;
+    }
+    formData.append('uploaded-file', file);
+    const url = `http://${appConfig.apiHost}:${appConfig.apiPort}${genre.icon}`;
+    console.log(url);
+    const response = await fetch(url, {
+      method: "POST",
+      body: formData
+    });
+    const json = await response.json();
+    onComplete();
+    console.log('result of uploading a genre icon: ' + JSON.stringify(json));
+    return true;
+  }
 
   function selectFile(event) {
-    setFile(event.target.files);
+    setFile(event.target.files[0]);
   }
 
   const iconFileRef = useRef();
   const handleClose = () => show.set(false);
   const handleUpload = async () => {
-    await uploadGenreIcon(iconFileRef.current.value);
+    const isCompleted = await uploadGenreIcon();
     show.set(false)
+    if (isCompleted) {
+      await delay(100);
+      alert("アイコンの変更が完了しました。");
+    }
   };
   
   return (
@@ -40,17 +54,17 @@ function UploadDialog({show}) {
       <Modal.Body>
         <form>
           <div className="form-group">
-            <label htmlFor="uploaded-files">アップロードするファイルを選んでください。</p>
+            <label htmlFor="uploaded-files">アップロードするファイルを選んでください。</label>
             <input type="file" name="uploaded-files" className="form-control form-control-lg" onChange={selectFile} ref={iconFileRef}/>
           </div>
         </form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClick}>
-          Close
+        <Button variant="secondary" onClick={handleClose}>
+          キャンセル
         </Button>
         <Button variant="primary" onClick={handleUpload}>
-          Save Changes
+          変更する
         </Button>
       </Modal.Footer>
     </Modal>
@@ -60,43 +74,53 @@ function UploadDialog({show}) {
 function GenreItem({genre}) {
   const { appConfig, viewSwitcher } = useContext(ViewContext);
   const [ showDialog, setShowDialog ] = useState(false);
-  const iconSrc = `http://${appConfig.apiHost}:${appConfig.apiPort}${genre.icon}`;
+  function refreshIconSrc() {
+    return `http://${appConfig.apiHost}:${appConfig.apiPort}${genre.icon}?${new Date().getTime()}`;
+  }
+  const [ iconSrc, setIconSrc ] = useState(refreshIconSrc());
   const containerStyle = {
     'position': 'relative'
   };
   const buttonStyle = {
     'position': 'absolute',
     'top': '0',
-    'right': '0'
+    'right': '0',
+    'zindex': -1,
+    'visibility': 'hidden'
   };
+  const uploadButtonRef = useRef();
   const imgStyle = {
     'position': 'absolute',
     'top': '0',
     'right': '0'
   };
   return (
-    <div>
-      <div style={containerStyle}>
-        <Button variant="link" style={buttonStyle} onClick{() => setShowDialog(true)}>
-          <img src={uploadIcon}/>
-        </Button>
-        <img className="genre-icon rounded-circle" style={imgStyle} src={iconSrc} width="160px" height="160px" alt="genre icon"/>
+    <>
+      <div>
+        <div style={containerStyle}
+             onMouseEnter={() => uploadButtonRef.current.style.visibility = 'visible'}
+             onMouseLeave={() => uploadButtonRef.current.style.visibility = 'hidden'}>
+          <div style={imgStyle}>
+            <img className="genre-icon rounded-circle" src={iconSrc} width="160px" height="160px" alt="genre icon"/>
+            <h3>{genre.genreName}</h3>
+            <Button variant="link" onClick={() => viewSwitcher.showAlbums({genre})}>
+              アルバム一覧を見る
+            </Button>
+            <Button variant="link" onClick={() => viewSwitcher.showArtists({genre})}>
+              アーティスト一覧を見る
+            </Button>
+          </div>
+          <Button variant="link" style={buttonStyle} onClick={() => setShowDialog(true)}  ref={uploadButtonRef}>
+            <img src={uploadIcon}/>
+          </Button>
+        </div>
       </div>
-      <h3>{genre.genreName}</h3>
-      <Button variant="link" onClick={() => viewSwitcher.showAlbums({genre})}>
-        アルバム一覧を見る
-      </Button>
-      <Button variant="link" onClick={() => viewSwitcher.showArtists({genre})}>
-        アーティスト一覧を見る
-      </Button>
-    </div>
-
-    <UploadDialog show={{value: showDialog, set: setShowDialog}}/>
+      <UploadDialog genre={genre} show={{value: showDialog, set: setShowDialog}} onComplete={() => setIconSrc(refreshIconSrc())}/>
+    </>
   );
 }
 
 export default function Genres() {
-  const { appConfig, viewSwitcher } = useContext(ViewContext);
   const [genres, setGenres] = useState([]);
   const { appConfig, appState, viewSwitcher } = useContext(ViewContext);
   const displayValue = appState?.visible.genres ? 'block' : 'none';

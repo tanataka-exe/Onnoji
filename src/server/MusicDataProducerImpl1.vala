@@ -9,6 +9,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
     public Moegi.FileInfoAdapter file_adapter { get; construct set; }
     public string artwork_base_path { get; construct set; }
     public string song_base_path { get; construct set; }
+    public string genre_icon_base_path { get; construct set; }
     public string genre_default_icon_path { get; construct set; }
     public string artwork_default_resource_uri { get; construct set; }
     
@@ -775,10 +776,16 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
     }
     
     public ServiceResponse? register_genre_icon(int genre_id, string genre_icon_file_path) throws OnnojiError {
-        string dest_genre_icon_file_path = "%s/gnr%012d".printf(genre_default_icon_path, genre_id);
+        string dest_genre_icon_file_path = "%s/gnr%012d".printf(genre_icon_base_path, genre_id);
+        debug("src_genre_icon_file_path = %s\n", genre_icon_file_path);
+        debug("dest_genre_icon_file_path = %s\n", dest_genre_icon_file_path);
         File src_file = File.new_for_path(genre_icon_file_path);
         File dest_file = File.new_for_path(dest_genre_icon_file_path);
-        src_file.move(dest_file, FileCopyFlags.NONE);
+        src_file.move(dest_file, FileCopyFlags.OVERWRITE);
+        genre_repo.update_by_id(genre_id,
+            slist<string>("genre_file_path"),
+            slist<Value?>(Values.of_string(dest_genre_icon_file_path))
+        );
         return new ServiceResponse.for_json(
             json_maker.object_node(json_maker.success_object())
         );

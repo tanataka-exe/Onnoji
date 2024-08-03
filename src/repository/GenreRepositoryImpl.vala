@@ -167,8 +167,13 @@ public class GenreRepositoryImpl : GenreRepository, BasicRepositoryImpl {
         return true;
     }
     
-    public bool update_by_id(int genre_id, string new_genre_name, string new_file_path,
-            SqlConditionType cond_type = EQUALS) throws Error {
+    public bool update_by_id(int genre_id, SList<string> col_names, SList<Value?> col_values) throws Error {
+        return conn.update_row_in_table_v(
+            "genre",
+            "genre_id", Values.of_int(genre_id),
+            col_names, col_values
+        );
+        /*
         int num_affected = execute_non_select_with_params(
             conn.create_parser().parse_string(res.get_string("genre-update-by-id"), null),
             "genre_id", Values.of_int(genre_id),
@@ -179,6 +184,7 @@ public class GenreRepositoryImpl : GenreRepository, BasicRepositoryImpl {
             throw new OnnojiError.SQL_ERROR("More than 1 rows are affected when applying update statement to genre");
         }
         return true;
+        */
     }
     
     public bool insert(Genre genre, SqlInsertFlags flags = 0) throws Error {

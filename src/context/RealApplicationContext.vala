@@ -142,6 +142,7 @@ public class RealApplicationContext : ApplicationContext, Object {
             file_adapter = get_moegi_file_info_adapter(),
             artwork_base_path = get_resource_manager().get_string("server.path.artwork"),
             song_base_path = get_resource_manager().get_string("server.path.song"),
+            genre_icon_base_path = get_resource_manager().get_string("server.path.genre"),
             genre_default_icon_path = get_resource_manager().get_string("server.path.genre-default-icon"),
             artwork_default_resource_uri = "/local/asusturn/onnoji/images/empty-image200.png"
         };
