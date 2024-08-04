@@ -410,6 +410,11 @@ export default function Songs() {
                        {albumData.albumName}
                      </Button>
                    )}
+                  <span>
+                    {song.pubDate != null && Number(song.pubDate) > 0 ?
+                     '(' + song.pubDate + ')' : ''
+                    }
+                  </span>
                 </span>
               </td>
               <td className="songTimeColumn text-right align-middle text-body"f>{formatTimeLength(song.timeLengthMilliseconds)}</td>
