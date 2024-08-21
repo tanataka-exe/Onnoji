@@ -1,5 +1,6 @@
 public interface SongRepository : Object {
     public abstract int get_next_song_id() throws Error;
+    public abstract Gee.List<Song> select_all() throws Error;
     public abstract Gee.List<Song> select_by_id(int song_id, SqlConditionType cond_type = EQUALS) throws Error;
     public abstract Gee.List<Song> select_by_playlist_id(int playlist_id, SqlConditionType cond_type = EQUALS) throws Error;
     public abstract Gee.List<Song> select_by_artist_id(int artist_id, SqlConditionType cond_type = EQUALS) throws Error;

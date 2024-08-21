@@ -17,6 +17,10 @@ public class SongRepositoryImpl : SongRepository, BasicRepositoryImpl {
         }
     }
 
+    public Gee.List<Song> select_all() throws Error {
+        return select_by_id(0, GREATER_THAN);
+    }
+    
     public Gee.List<Song> select_by_id(int song_id, SqlConditionType cond_type = EQUALS) throws Error {
         string sql;
         string param_name;
