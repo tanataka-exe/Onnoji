@@ -77,7 +77,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/song/[song_id]/metadata")) {
 
                 if (method == METHOD_GET) {
-                    yield do_get_song_metadata(int.parse(path.split("/")[4]));
+                    do_get_song_metadata(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -93,7 +93,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/song/[song_id]/genres")) {
 
                 if (method == METHOD_GET) {
-                    yield do_get_song_genres(int.parse(path.split("/")[4]));
+                    do_get_song_genres(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -101,7 +101,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/song/[song_id]/artists")) {
 
                 if (method == METHOD_GET) {
-                    yield do_get_song_artists(int.parse(path.split("/")[4]));
+                    do_get_song_artists(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -109,7 +109,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/song/[song_id]/albums")) {
 
                 if (method == METHOD_GET) {
-                    yield do_get_song_albums(int.parse(path.split("/")[4]));
+                    do_get_song_albums(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -117,7 +117,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/song/[song_id]/playlists")) {
 
                 if (method == METHOD_GET) {
-                    yield do_get_song_playlists(int.parse(path.split("/")[4]));
+                    do_get_song_playlists(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -133,7 +133,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/playlists")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_all_playlists(false);
+                    do_get_all_playlists(false);
                 } else {
                     msg.status_code = 405;
                 }
@@ -141,7 +141,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/playlist")) {
                 
                 if (method == METHOD_POST) {
-                    yield do_post_playlist();
+                    do_post_playlist();
                 } else {
                     msg.status_code = 405;
                 }
@@ -149,7 +149,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/albums")) {
 
                 if (method == METHOD_GET) {
-                    yield do_get_all_playlists(true);
+                    do_get_all_playlists(true);
                 } else {
                     msg.status_code = 405;
                 }
@@ -157,7 +157,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/album")) {
 
                 if (method == METHOD_POST) {
-                    yield do_post_album();
+                    do_post_album();
                 } else {
                     msg.status_code = 405;
                 }
@@ -166,7 +166,7 @@ public class OnnojiActionHandler : Object {
                     || OnnojiPaths.match_path(path, "/api/v2/album/[album_id]")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_playlist(int.parse(path.split("/")[4]));
+                    do_get_playlist(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -175,7 +175,7 @@ public class OnnojiActionHandler : Object {
                     || OnnojiPaths.match_path(path, "/api/v2/album/[album_id]/songs")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_playlist_songs(int.parse(path.split("/")[4]));
+                    do_get_playlist_songs(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -184,7 +184,7 @@ public class OnnojiActionHandler : Object {
                     || OnnojiPaths.match_path(path, "/api/v2/album/[album_id]/genres")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_playlist_genres(int.parse(path.split("/")[4]));
+                    do_get_playlist_genres(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -193,7 +193,7 @@ public class OnnojiActionHandler : Object {
                     || OnnojiPaths.match_path(path, "/api/v2/album/[album_id]/artists")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_playlist_artists(int.parse(path.split("/")[4]));
+                    do_get_playlist_artists(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -202,7 +202,7 @@ public class OnnojiActionHandler : Object {
                     || OnnojiPaths.match_path(path, "/api/v2/album/[album_id]/artworks")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_playlist_artworks(int.parse(path.split("/")[4]));
+                    do_get_playlist_artworks(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -219,7 +219,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/artist/[artist_id]")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_artist(int.parse(path.split("/")[4]));
+                    do_get_artist(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -227,7 +227,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/artist/[artist_id]/albums")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_artist_albums(int.parse(path.split("/")[4]));
+                    do_get_artist_albums(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -235,7 +235,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/artist/[artist_id]/playlists")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_artist_playlists(int.parse(path.split("/")[4]));
+                    do_get_artist_playlists(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -243,7 +243,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/artist/[artist_id]/genres")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_artist_genres(int.parse(path.split("/")[4]));
+                    do_get_artist_genres(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -251,7 +251,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/artist/[artist_id]/songs")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_artist_songs(int.parse(path.split("/")[4]));
+                    do_get_artist_songs(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -259,7 +259,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/genres")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_genres();
+                    do_get_genres();
                 } else {
                     msg.status_code = 405;
                 }
@@ -269,7 +269,7 @@ public class OnnojiActionHandler : Object {
                 if (method == METHOD_GET) {
                     yield do_get_genre_icon(int.parse(path.split("/")[4]));
                 } else if (method == METHOD_POST) {
-                    yield do_post_genre_icon(int.parse(path.split("/")[4]));
+                    do_post_genre_icon(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -277,7 +277,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/genre/[genre_id]/playlists")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_genre_playlists(int.parse(path.split("/")[4]));
+                    do_get_genre_playlists(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -285,7 +285,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/genre/[genre_id]/albums")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_genre_albums(int.parse(path.split("/")[4]));
+                    do_get_genre_albums(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -293,7 +293,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/genre/[genre_id]/artists")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_genre_artists(int.parse(path.split("/")[4]));
+                    do_get_genre_artists(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -301,7 +301,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/history/[song_id]")) {
                 
                 if (method == METHOD_POST) {
-                    yield do_post_history(int.parse(path.split("/")[4]));
+                    do_post_history(int.parse(path.split("/")[4]));
                 } else {
                     msg.status_code = 405;
                 }
@@ -309,7 +309,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/recently-requested/[min-max]/songs")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_recently_requested_songs(path.split("/")[4]);
+                    do_get_recently_requested_songs(path.split("/")[4]);
                 } else {
                     msg.status_code = 405;
                 }
@@ -317,7 +317,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/recently-requested/[min-max]/playlists")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_recently_requested_playlists(path.split("/")[4]);
+                    do_get_recently_requested_playlists(path.split("/")[4]);
                 } else {
                     msg.status_code = 405;
                 }
@@ -325,7 +325,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/recently-requested/[min-max]/albums")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_recently_requested_albums(path.split("/")[4]);
+                    do_get_recently_requested_albums(path.split("/")[4]);
                 } else {
                     msg.status_code = 405;
                 }
@@ -333,7 +333,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/recently-registered/[min-max]/songs")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_recently_registered_songs(path.split("/")[4]);
+                    do_get_recently_registered_songs(path.split("/")[4]);
                 } else {
                     msg.status_code = 405;
                 }
@@ -341,7 +341,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/recently-registered/[min-max]/playlists")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_recently_registered_playlists(path.split("/")[4]);
+                    do_get_recently_registered_playlists(path.split("/")[4]);
                 } else {
                     msg.status_code = 405;
                 }
@@ -349,7 +349,7 @@ public class OnnojiActionHandler : Object {
             } else if (OnnojiPaths.match_path(path, "/api/v2/recently-registered/[min-max]/albums")) {
                 
                 if (method == METHOD_GET) {
-                    yield do_get_recently_registered_albums(path.split("/")[4]);
+                    do_get_recently_registered_albums(path.split("/")[4]);
                 } else {
                     msg.status_code = 405;
                 }
@@ -402,7 +402,7 @@ public class OnnojiActionHandler : Object {
     /**
      * POST /api/v2/history/[song_id]
      */
-    private async void do_post_history(int song_id) throws OnnojiError {
+    private void do_post_history(int song_id) throws OnnojiError {
 
         if (!is_song_id_valid(song_id)) {
             msg.status_code = 404;
@@ -411,21 +411,21 @@ public class OnnojiActionHandler : Object {
         
         debug("history post");
 
-        var res = yield producer.register_song_history(song_id);
+        var res = producer.register_song_history(song_id);
         set_service_response(200, res);
     }
     
     /**
      * GET /api/v2/song/[song_id]/metadata
      */
-    private async void do_get_song_metadata(int song_id) throws OnnojiError {
+    private void do_get_song_metadata(int song_id) throws OnnojiError {
 
         if (!is_song_id_valid(song_id)) {
             msg.status_code = 404;
             return;
         }
 
-        var res = yield producer.query_song_metadata(song_id);
+        var res = producer.query_song_metadata(song_id);
         set_service_response(200, res);
     }
 
@@ -450,56 +450,56 @@ public class OnnojiActionHandler : Object {
     /**
      * GET /api/v2/song/[song_id]/artists
      */
-    private async void do_get_song_artists(int song_id) throws OnnojiError {
+    private void do_get_song_artists(int song_id) throws OnnojiError {
 
         if (!is_song_id_valid(song_id)) {
             msg.status_code = 404;
             return;
         }
 
-        var res = yield producer.query_song_artists(song_id);
+        var res = producer.query_song_artists(song_id);
         set_service_response(200, res);
     }
      
     /**
      * GET /api/v2/song/[song_id]/genres
      */
-    private async void do_get_song_genres(int song_id) throws OnnojiError {
+    private void do_get_song_genres(int song_id) throws OnnojiError {
 
         if (!is_song_id_valid(song_id)) {
             msg.status_code = 404;
             return;
         }
 
-        var res = yield producer.query_song_genres(song_id);
+        var res = producer.query_song_genres(song_id);
         set_service_response(200, res);
     }
      
     /**
      * GET /api/v2/song/[song_id]/albums
      */
-    private async void do_get_song_albums(int song_id) throws OnnojiError {
+    private void do_get_song_albums(int song_id) throws OnnojiError {
 
         if (!is_song_id_valid(song_id)) {
             msg.status_code = 404;
             return;
         }
 
-        var res = yield producer.query_song_albums(song_id);
+        var res = producer.query_song_albums(song_id);
         set_service_response(200, res);
     }
      
     /**
      * GET /api/v2/song/[song_id]/playlists
      */
-    private async void do_get_song_playlists(int song_id) throws OnnojiError {
+    private void do_get_song_playlists(int song_id) throws OnnojiError {
 
         if (!is_song_id_valid(song_id)) {
             msg.status_code = 404;
             return;
         }
 
-        var res = yield producer.query_song_playlists(song_id);
+        var res = producer.query_song_playlists(song_id);
         set_service_response(200, res);
     }
      
@@ -510,7 +510,7 @@ public class OnnojiActionHandler : Object {
 
         if (artwork_id == 0) {
             debug("query artwork default");
-            var res = yield producer.query_artwork_default();
+            var res = producer.query_artwork_default();
             set_service_response(200, res);
         } else {
             var res = yield producer.query_artwork(artwork_id);
@@ -527,14 +527,14 @@ public class OnnojiActionHandler : Object {
     /**
      * GET /api/v2/[playlist/album]
      */
-    private async void do_get_all_playlists(bool is_album) throws OnnojiError {
+    private void do_get_all_playlists(bool is_album) throws OnnojiError {
         msg.status_code = 404;
     }
     
     /**
      * POST /api/v2/playlist
      */
-    private async void do_post_playlist() throws OnnojiError {
+    private void do_post_playlist() throws OnnojiError {
         msg.status_code = 405;
     }
 
@@ -570,7 +570,7 @@ public class OnnojiActionHandler : Object {
 
                         yield OnnojiFileUtils.set_data_async(part_file_path, buffer.data);
 
-                        var res = yield producer.register_genre_icon(genre_id, part_file_path);
+                        var res = producer.register_genre_icon(genre_id, part_file_path);
 
                         set_service_response(200, res);
 
@@ -655,77 +655,77 @@ public class OnnojiActionHandler : Object {
             return;
         }
         
-        var res = yield producer.register_playlist_with_songs(album_title, file_list);
+        var res = producer.register_playlist_with_songs(album_title, file_list);
         set_service_response(200, res);
     }
     
     /**
      * POST/api/v2/playlist
      */
-    private async void do_get_playlist(int playlist_id) throws OnnojiError {
+    private void do_get_playlist(int playlist_id) throws OnnojiError {
 
         if (!is_playlist_id_valid(playlist_id)) {
             msg.status_code = 404;
             return;
         }
 
-        var res = yield producer.query_playlist_by_id(playlist_id);
+        var res = producer.query_playlist_by_id(playlist_id);
         set_service_response(200, res);
     }
     
     /**
      * GET /api/v2/playlist/[playlist_id]/songs
      */
-    private async void do_get_playlist_songs(int playlist_id) throws OnnojiError {
+    private void do_get_playlist_songs(int playlist_id) throws OnnojiError {
 
         if (!is_playlist_id_valid(playlist_id)) {
             msg.status_code = 404;
             return;
         }
 
-        var res = yield producer.query_playlist_songs(playlist_id);
+        var res = producer.query_playlist_songs(playlist_id);
         set_service_response(200, res);
     }
 
     /**
      * GET /api/v2/playlist/[playlist_id]/genres
      */
-    private async void do_get_playlist_genres(int playlist_id) throws OnnojiError {
+    private void do_get_playlist_genres(int playlist_id) throws OnnojiError {
 
         if (!is_playlist_id_valid(playlist_id)) {
             msg.status_code = 404;
             return;
         }
 
-        var res = yield producer.query_playlist_genres(playlist_id);
+        var res = producer.query_playlist_genres(playlist_id);
         set_service_response(200, res);
     }
     
     /**
      * GET /api/v2/playlist/[playlist_id]/artists
      */
-    private async void do_get_playlist_artists(int playlist_id) throws OnnojiError {
+    private void do_get_playlist_artists(int playlist_id) throws OnnojiError {
 
         if (!is_playlist_id_valid(playlist_id)) {
             msg.status_code = 404;
             return;
         }
 
-        var res = yield producer.query_playlist_artists(playlist_id);
+        var res = producer.query_playlist_artists(playlist_id);
         set_service_response(200, res);
     }
     
     /**
      * GET /api/v2/playlist/[playlist_id]/artworks
      */
-    private async void do_get_playlist_artworks(int playlist_id) throws OnnojiError {
+    private void do_get_playlist_artworks(int playlist_id) throws OnnojiError {
 
         if (!is_playlist_id_valid(playlist_id)) {
             msg.status_code = 404;
             return;
         }
 
-        var res = yield producer.query_playlist_artworks(playlist_id);
+        var res = producer.query_playlist_artworks(playlist_id);
         if (res != null) {
             set_service_response(200, res);
         } else {
@@ -754,78 +754,78 @@ public class OnnojiActionHandler : Object {
     /**
      * GET /api/v2/artist/[artist_id]
      */
-    private async void do_get_artist(int artist_id) throws OnnojiError {
+    private void do_get_artist(int artist_id) throws OnnojiError {
 
         if (!is_artist_id_valid(artist_id)) {
             msg.status_code = 404;
             return;
         }
 
-        var res = yield producer.query_artist(artist_id);
+        var res = producer.query_artist(artist_id);
         set_service_response(200, res);
     }
     
     /**
      * GET /api/v2/artist/[artist_id]/songs
      */
-    private async void do_get_artist_songs(int artist_id) throws OnnojiError {
+    private void do_get_artist_songs(int artist_id) throws OnnojiError {
 
         if (!is_artist_id_valid(artist_id)) {
             msg.status_code = 404;
             return;
         }
 
-        var res = yield producer.query_artist_songs(artist_id);
+        var res = producer.query_artist_songs(artist_id);
         set_service_response(200, res);
     }
     
     /**
      * GET /api/v2/artist/[artist_id]/albums
      */
-    private async void do_get_artist_albums(int artist_id) throws OnnojiError {
+    private void do_get_artist_albums(int artist_id) throws OnnojiError {
 
         if (!is_artist_id_valid(artist_id)) {
             msg.status_code = 404;
             return;
         }
 
-        var res = yield producer.query_artist_albums(artist_id);
+        var res = producer.query_artist_albums(artist_id);
         set_service_response(200, res);
     }
     
     /**
      * GET /api/v2/artist/[artist_id]/playlists
      */
-    private async void do_get_artist_playlists(int artist_id) throws OnnojiError {
+    private void do_get_artist_playlists(int artist_id) throws OnnojiError {
 
         if (!is_artist_id_valid(artist_id)) {
             msg.status_code = 404;
             return;
         }
 
-        var res = yield producer.query_artist_playlists(artist_id);
+        var res = producer.query_artist_playlists(artist_id);
         set_service_response(200, res);
     }
     
     /**
      * GET /api/v2/artist/[artist_id]/playlists
      */
-    private async void do_get_artist_genres(int artist_id) throws OnnojiError {
+    private void do_get_artist_genres(int artist_id) throws OnnojiError {
 
         if (!is_artist_id_valid(artist_id)) {
             msg.status_code = 404;
             return;
         }
 
-        var res = yield producer.query_artist_genres(artist_id);
+        var res = producer.query_artist_genres(artist_id);
         set_service_response(200, res);
     }
     
     /**
      * GET /api/v2/genres
      */
-    private async void do_get_genres() throws OnnojiError {
-        var res = yield producer.query_genres();
+    private void do_get_genres() throws OnnojiError {
+        var res = producer.query_genres();
         set_service_response(200, res);
     }
     
@@ -846,49 +846,49 @@ public class OnnojiActionHandler : Object {
     /**
      * GET /api/v2/genre/[genre_id]/playlists
      */
-    private async void do_get_genre_playlists(int genre_id) throws OnnojiError {
+    private void do_get_genre_playlists(int genre_id) throws OnnojiError {
         
         if (!is_genre_id_valid(genre_id)) {
             msg.status_code = 404;
             return;
         }
 
-        var res = yield producer.query_genre_playlists(genre_id);
+        var res = producer.query_genre_playlists(genre_id);
         set_service_response(200, res);
     }
     
     /**
      * GET /api/v2/genre/[genre_id]/albums
      */
-    private async void do_get_genre_albums(int genre_id) throws OnnojiError {
+    private void do_get_genre_albums(int genre_id) throws OnnojiError {
         
         if (!is_genre_id_valid(genre_id)) {
             msg.status_code = 404;
             return;
         }
 
-        var res = yield producer.query_genre_albums(genre_id);
+        var res = producer.query_genre_albums(genre_id);
         set_service_response(200, res);
     }
     
     /**
      * GET /api/v2/genre/[genre_id]/artists
      */
-    private async void do_get_genre_artists(int genre_id) throws OnnojiError {
+    private void do_get_genre_artists(int genre_id) throws OnnojiError {
         
         if (!is_genre_id_valid(genre_id)) {
             msg.status_code = 404;
             return;
         }
 
-        var res = yield producer.query_genre_artists(genre_id);
+        var res = producer.query_genre_artists(genre_id);
         set_service_response(200, res);
     }
     
     /**
      * GET /api/v2/recently-requested/[min-max]/songs
      */
-    private async void do_get_recently_requested_songs(string min_max) throws OnnojiError {
+    private void do_get_recently_requested_songs(string min_max) throws OnnojiError {
 
         int min, max;
         if (!get_min_max_parameter(min_max, out min, out max)) {
@@ -901,14 +901,14 @@ public class OnnojiActionHandler : Object {
             return;
         }
 
-        var res = yield producer.query_recently_requested_songs(min, max);
+        var res = producer.query_recently_requested_songs(min, max);
         set_service_response(200, res);
     }
     
     /**
      * GET /api/v2/recently-requested/[min-max]/albums
      */
-    private async void do_get_recently_requested_albums(string min_max) throws OnnojiError {
+    private void do_get_recently_requested_albums(string min_max) throws OnnojiError {
 
         int min, max;
         if (!get_min_max_parameter(min_max, out min, out max)) {
@@ -921,14 +921,14 @@ public class OnnojiActionHandler : Object {
             return;
         }
 
-        var res = yield producer.query_recently_requested_playlists(min, max, true);
+        var res = producer.query_recently_requested_playlists(min, max, true);
         set_service_response(200, res);
     }
     
     /**
      * GET /api/v2/recently-requested/[min-max]/playlist
      */
-    private async void do_get_recently_requested_playlists(string min_max) throws OnnojiError {
+    private void do_get_recently_requested_playlists(string min_max) throws OnnojiError {
 
         int min, max;
         if (!get_min_max_parameter(min_max, out min, out max)) {
@@ -941,14 +941,14 @@ public class OnnojiActionHandler : Object {
             return;
         }
 
-        var res = yield producer.query_recently_requested_playlists(min, max, false);
+        var res = producer.query_recently_requested_playlists(min, max, false);
         set_service_response(200, res);
     }
     
     /**
      * GET /api/v2/recently-registered/[min-max]/songs
      */
-    private async void do_get_recently_registered_songs(string min_max) throws OnnojiError {
+    private void do_get_recently_registered_songs(string min_max) throws OnnojiError {
 
         int min, max;
         if (!get_min_max_parameter(min_max, out min, out max)) {
@@ -961,14 +961,14 @@ public class OnnojiActionHandler : Object {
             return;
         }
 
-        var res = yield producer.query_recently_registered_songs(min, max);
+        var res = producer.query_recently_registered_songs(min, max);
         set_service_response(200, res);
     }
     
     /**
      * GET /api/v2/recently-registered/[min-max]/albums
      */
-    private async void do_get_recently_registered_albums(string min_max) throws OnnojiError {
+    private void do_get_recently_registered_albums(string min_max) throws OnnojiError {
         
         debug("get recently registered albums");
 
@@ -985,14 +985,14 @@ public class OnnojiActionHandler : Object {
             return;
         }
 
-        var res = yield producer.query_recently_registered_playlists(min, max, true);
+        var res = producer.query_recently_registered_playlists(min, max, true);
         set_service_response(200, res);
     }
     
     /**
      * GET /api/v2/recently-registered/[min-max]/playlists
      */
-    private async void do_get_recently_registered_playlists(string min_max) throws OnnojiError {
+    private void do_get_recently_registered_playlists(string min_max) throws OnnojiError {
 
         int min, max;
         if (!get_min_max_parameter(min_max, out min, out max)) {
@@ -1005,7 +1005,7 @@ public class OnnojiActionHandler : Object {
             return;
         }
 
-        var res = yield producer.query_recently_registered_playlists(min, max, false);
+        var res = producer.query_recently_registered_playlists(min, max, false);
         set_service_response(200, res);
     }
 
