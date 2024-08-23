@@ -9,7 +9,7 @@ public interface ApplicationContext : Object {
     public abstract PlaylistRepository get_playlist_repository() throws Error;
     public abstract HistoryRepository get_history_repository() throws Error;
     public abstract Soup.Server get_server() throws Error;
-    public abstract OnnojiThreadData get_onnoji_thread_data() throws Error;
+    public abstract OnnojiActionHandler get_onnoji_action_handler() throws Error;
     public abstract MusicDataProducer get_music_data_producer() throws Error;
     public abstract ResponseJsonMaker get_response_json_maker() throws Error;
     //public abstract OnnojiBatch get_onnoji_batch() throws Error;

@@ -1,4 +1,13 @@
 int main(string[] args) {
+    MainLoop loop = new MainLoop();
+    main_async.begin(args, (x, y) => {
+        loop.quit();
+    });
+    loop.run();
+    return 0;
+}
+
+async int main_async(string[] args) {
     try {
         Gst.init(ref args);
         set_print_handler(text => stdout.puts(text));
@@ -7,50 +16,50 @@ int main(string[] args) {
         ServiceResponse? response = null;
         switch (args[1]) {
           case "test-query-genres":
-            response = producer.query_genres();
+            response = yield producer.query_genres();
             break;
           case "test-query-song-metadata":
             if (args.length >= 3) {
-                response = producer.query_song_metadata(int.parse(args[2]));
+                response = yield producer.query_song_metadata(int.parse(args[2]));
             }
             break;
           case "test-query-playlist-songs":
             if (args.length >= 3) {
-                response = producer.query_playlist_songs(int.parse(args[2]));
+                response = yield producer.query_playlist_songs(int.parse(args[2]));
             }
             break;
           case "test-query-genre-albums":
             if (args.length >= 3) {
-                response = producer.query_genre_albums(int.parse(args[2]));
+                response = yield producer.query_genre_albums(int.parse(args[2]));
             }
             break;
           case "test-query-genre-artists":
             if (args.length >= 3) {
-                response = producer.query_genre_artists(int.parse(args[2]));
+                response = yield producer.query_genre_artists(int.parse(args[2]));
             }
             break;
           case "test-query-artist-albums":
             if (args.length >= 3) {
-                response = producer.query_artist_albums(int.parse(args[2]));
+                response = yield producer.query_artist_albums(int.parse(args[2]));
             }
             break;
           case "test-query-recently-requested-songs":
             if (args.length >= 4) {
-                response = producer.query_recently_requested_songs(int.parse(args[2]), int.parse(args[3]));
+                response = yield producer.query_recently_requested_songs(int.parse(args[2]), int.parse(args[3]));
             }
             break;
           case "test-query-recently-registered-songs":
             if (args.length >= 4) {
-                response = producer.query_recently_registered_songs(int.parse(args[2]), int.parse(args[3]));
+                response = yield producer.query_recently_registered_songs(int.parse(args[2]), int.parse(args[3]));
             }
             break;
           case "test-query-recently-registered-albums":
             if (args.length >= 4) {
-                response = producer.query_recently_registered_playlists(int.parse(args[2]), int.parse(args[3]), true);
+                response = yield producer.query_recently_registered_playlists(int.parse(args[2]), int.parse(args[3]), true);
             }
             break;
           case "test-upload-files":
-            response = test_upload_files(producer);
+            response = yield test_upload_files(producer);
             break;
         }
         if (response != null) {
@@ -74,7 +83,7 @@ string data_array_to_string(uint8[] data) {
     return (string) str;
 }
 
-ServiceResponse test_upload_files(MusicDataProducer producer) {
+async ServiceResponse test_upload_files(MusicDataProducer producer) {
     Gee.List<PostFileData> file_list = new Gee.ArrayList<PostFileData>();
     string[] file_names = {
         "sng000000001865",
@@ -106,5 +115,5 @@ ServiceResponse test_upload_files(MusicDataProducer producer) {
         file_list.add(data);
     }
     string album_title = "Test Album";
-    return producer.register_playlist_with_songs(album_title, file_list);
+    return yield producer.register_playlist_with_songs(album_title, file_list);
 }

@@ -15,7 +15,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
     
     construct {}
     
-    public ServiceResponse? register_song_history(int song_id) throws OnnojiError {
+    public async ServiceResponse? register_song_history(int song_id) throws OnnojiError {
         try {
             int history_id = history_repo.get_next_history_id();
             history_repo.insert(new History() {
@@ -31,13 +31,13 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
     
-    public ServiceResponse? query_song_stream(int song_id) throws OnnojiError {
+    public async ServiceResponse? query_song_stream(int song_id) throws OnnojiError {
         try {
             Gee.List<Song> songs = this.song_repo.select_by_id(song_id);
             if (songs.size == 1) {
                 Song? song = songs[0];
                 uint8[] bytestream;
-                FileUtils.get_data(song.file_path, out bytestream);
+                yield OnnojiFileUtils.get_data_async(song.file_path, out bytestream);
                 return new ServiceResponse(bytestream, song.mime_type);
             } else {
                 return null;
@@ -49,7 +49,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_artwork_default() throws OnnojiError {
+    public async ServiceResponse? query_artwork_default() throws OnnojiError {
         try {
             Gdk.Pixbuf? icon_data = new Gdk.Pixbuf.from_resource(artwork_default_resource_uri);
             if (icon_data == null) {
@@ -63,13 +63,13 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
     
-    public ServiceResponse? query_artwork(int artwork_id) throws OnnojiError {
+    public async ServiceResponse? query_artwork(int artwork_id) throws OnnojiError {
         try {
             Gee.List<Artwork>? artworks = artwork_repo.select_by_id(artwork_id);
             if (artworks.size != 0) {
                 uint8[] data;
                 Artwork artwork = artworks[0];
-                FileUtils.get_data(artwork.artwork_file_path, out data);
+                yield OnnojiFileUtils.get_data_async(artwork.artwork_file_path, out data);
                 if (artwork.mime_type == null) {
                     File artwork_file = File.new_for_path(artwork.artwork_file_path);
                     GLib.FileInfo? artwork_file_info = artwork_file.query_info("standard::*", 0);
@@ -88,13 +88,13 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_song_artwork(int song_id) throws OnnojiError {
+    public async ServiceResponse? query_song_artwork(int song_id) throws OnnojiError {
         try {
             Gee.List<Artwork>? artworks = artwork_repo.select_by_song_id(song_id);
             if (artworks.size > 0) {
                 uint8[] data;
                 Artwork artwork = artworks[0];
-                return query_artwork(artwork.artwork_id);
+                return yield query_artwork(artwork.artwork_id);
             } else {
                 return null;
             }
@@ -103,7 +103,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
     
-    public ServiceResponse? query_song_metadata(int song_id) throws OnnojiError {
+    public async ServiceResponse? query_song_metadata(int song_id) throws OnnojiError {
         try {
             Gee.List<Song>? songs = song_repo.select_by_id(song_id);
             if (songs.size == 0) {
@@ -117,7 +117,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_song_artists(int song_id) throws OnnojiError {
+    public async ServiceResponse? query_song_artists(int song_id) throws OnnojiError {
         try {
             Gee.List<Artist>? artists = artist_repo.select_by_song_id(song_id);
             if (artists.size == 0) {
@@ -131,7 +131,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_song_genres(int song_id) throws OnnojiError {
+    public async ServiceResponse? query_song_genres(int song_id) throws OnnojiError {
         try {
             Gee.List<Genre>? genres = genre_repo.select_by_song_id(song_id);
             if (genres.size == 0) {
@@ -145,7 +145,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_song_albums(int song_id) throws OnnojiError {
+    public async ServiceResponse? query_song_albums(int song_id) throws OnnojiError {
         try {
             Gee.List<Playlist>? playlists = playlist_repo.select_by_song_id(song_id);
             Gee.List<Playlist> albums = new Gee.ArrayList<Playlist>();
@@ -161,7 +161,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_song_playlists(int song_id) throws OnnojiError {
+    public async ServiceResponse? query_song_playlists(int song_id) throws OnnojiError {
         try {
             Gee.List<Playlist>? playlists = playlist_repo.select_by_song_id(song_id);
             Gee.List<Playlist> playlists2 = new Gee.ArrayList<Playlist>();
@@ -177,7 +177,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_playlist_by_id(int playlist_id) throws OnnojiError {
+    public async ServiceResponse? query_playlist_by_id(int playlist_id) throws OnnojiError {
         try {
             Gee.List<Playlist> playlists = playlist_repo.select_by_id(playlist_id);
             if (playlists.size == 0) {
@@ -191,7 +191,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_playlist_songs(int playlist_id) throws OnnojiError {
+    public async ServiceResponse? query_playlist_songs(int playlist_id) throws OnnojiError {
         try {
             Gee.List<Song> songs = song_repo.select_by_playlist_id(playlist_id);
             if (songs.size == 0) {
@@ -207,7 +207,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_playlist_genres(int playlist_id) throws OnnojiError {
+    public async ServiceResponse? query_playlist_genres(int playlist_id) throws OnnojiError {
         try {
             Gee.List<Genre> genres = genre_repo.select_by_playlist_id(playlist_id);
             if (genres.size == 0) {
@@ -223,7 +223,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_playlist_artists(int playlist_id) throws OnnojiError {
+    public async ServiceResponse? query_playlist_artists(int playlist_id) throws OnnojiError {
         try {
             Gee.List<Artist> artists = artist_repo.select_by_playlist_id(playlist_id);
             if (artists.size == 0) {
@@ -239,7 +239,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_playlist_artworks(int playlist_id) throws OnnojiError {
+    public async ServiceResponse? query_playlist_artworks(int playlist_id) throws OnnojiError {
         try {
             Gee.List<Artwork> artworks = artwork_repo.select_by_playlist_id(playlist_id);
             if (artworks.size == 0) {
@@ -255,19 +255,19 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_playlist_artwork(int playlist_id) throws OnnojiError {
+    public async ServiceResponse? query_playlist_artwork(int playlist_id) throws OnnojiError {
         try {
             Gee.List<Artwork> artworks = artwork_repo.select_by_playlist_id(playlist_id);
             if (artworks.size == 0) {
-                return query_artwork(0);
+                return yield query_artwork(0);
             }
-            return query_artwork(artworks[0].artwork_id);
+            return yield query_artwork(artworks[0].artwork_id);
         } catch (Error e) {
             throw new OnnojiError.SQL_ERROR(e.message);
         }
     }
 
-    public ServiceResponse? query_artists() throws OnnojiError {
+    public async ServiceResponse? query_artists() throws OnnojiError {
         try {
             Gee.List<Artist> artists = artist_repo.select_all();
             if (artists.size == 0) {
@@ -283,7 +283,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_artist(int artist_id) throws OnnojiError {
+    public async ServiceResponse? query_artist(int artist_id) throws OnnojiError {
         try {
             Gee.List<Artist> artists = artist_repo.select_by_id(artist_id);
             if (artists.size == 0) {
@@ -297,7 +297,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_artist_songs(int artist_id) throws OnnojiError {
+    public async ServiceResponse? query_artist_songs(int artist_id) throws OnnojiError {
         try {
             Gee.List<Song> songs = song_repo.select_by_artist_id(artist_id);
             if (songs.size == 0) {
@@ -313,7 +313,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_artist_genres(int artist_id) throws OnnojiError {
+    public async ServiceResponse? query_artist_genres(int artist_id) throws OnnojiError {
         try {
             Gee.List<Genre> genres = genre_repo.select_by_artist_id(artist_id);
             if (genres.size == 0) {
@@ -329,7 +329,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_genre_icon(int genre_id) throws OnnojiError {
+    public async ServiceResponse? query_genre_icon(int genre_id) throws OnnojiError {
         try {
             Gee.List<Genre>? genres = genre_repo.select_by_id(genre_id);
             if (genres.size == 0) {
@@ -344,7 +344,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
             } else {
                 file_path = genre.genre_file_path;
             }
-            FileUtils.get_data(file_path, out data);
+            yield OnnojiFileUtils.get_data_async(file_path, out data);
             File genre_file = File.new_for_path(file_path);
             GLib.FileInfo? genre_file_info = genre_file.query_info("standard::*", 0);
             string mime_type = genre_file_info.get_content_type();
@@ -356,7 +356,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
     
-    public ServiceResponse? query_genre_songs(int genre_id) throws OnnojiError {
+    public async ServiceResponse? query_genre_songs(int genre_id) throws OnnojiError {
         try {
             Gee.List<Song> songs = song_repo.select_by_genre_id(genre_id);
             if (songs.size == 0) {
@@ -370,7 +370,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_genre_playlists(int genre_id) throws OnnojiError {
+    public async ServiceResponse? query_genre_playlists(int genre_id) throws OnnojiError {
         try {
             Gee.List<Playlist> playlist_list = new Gee.ArrayList<Playlist>();
             playlist_list.add_all_iterator(playlist_repo.select_by_genre_id(genre_id)
@@ -388,7 +388,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
     
-    public ServiceResponse? query_genre_albums(int genre_id) throws OnnojiError {
+    public async ServiceResponse? query_genre_albums(int genre_id) throws OnnojiError {
 
         try {
             Gee.List<Playlist> playlist_list = new Gee.ArrayList<Playlist>();
@@ -411,7 +411,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
     
-    public ServiceResponse? query_genre_artists(int genre_id) throws OnnojiError {
+    public async ServiceResponse? query_genre_artists(int genre_id) throws OnnojiError {
         try {
             Gee.List<Artist> artists = artist_repo.select_by_genre_id(genre_id);
             if (artists.size == 0) {
@@ -427,7 +427,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_artist_playlists(int artist_id) throws OnnojiError {
+    public async ServiceResponse? query_artist_playlists(int artist_id) throws OnnojiError {
 
         try {
             Gee.List<Playlist> playlist_list = new Gee.ArrayList<Playlist>();
@@ -450,7 +450,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
     
-    public ServiceResponse? query_artist_albums(int artist_id) throws OnnojiError {
+    public async ServiceResponse? query_artist_albums(int artist_id) throws OnnojiError {
         try {
 
             Gee.List<Playlist> playlist_list = new Gee.ArrayList<Playlist>();
@@ -473,7 +473,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
     
-    public ServiceResponse? query_recently_requested_playlists(int min, int max, bool is_album) throws OnnojiError {
+    public async ServiceResponse? query_recently_requested_playlists(int min, int max, bool is_album) throws OnnojiError {
         try {
             Gee.List<Playlist> playlist_list = playlist_repo.select_recently_requested(min, max, is_album);
             if (playlist_list.size == 0) {
@@ -494,7 +494,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_recently_requested_songs(int min, int max) throws OnnojiError {
+    public async ServiceResponse? query_recently_requested_songs(int min, int max) throws OnnojiError {
         try {
             Gee.List<Song> song_list = song_repo.select_recently_requested(min, max);
             debug("retrive song_list OK");
@@ -512,7 +512,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
     
-    public ServiceResponse? query_recently_registered_playlists(int min, int max, bool is_album) throws OnnojiError {
+    public async ServiceResponse? query_recently_registered_playlists(int min, int max, bool is_album) throws OnnojiError {
         try {
             Gee.List<Playlist> playlist_list = playlist_repo.select_recently_registered(min, max, is_album);
             if (playlist_list.size == 0) {
@@ -532,7 +532,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_recently_registered_songs(int min, int max) throws OnnojiError {
+    public async ServiceResponse? query_recently_registered_songs(int min, int max) throws OnnojiError {
         try {
             Gee.List<Song> song_list = song_repo.select_recently_registered(min, max);
             if (song_list.size == 0) {
@@ -549,7 +549,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? query_genres() throws OnnojiError {
+    public async ServiceResponse? query_genres() throws OnnojiError {
         try {
             Gee.List<Genre> genre_list = genre_repo.select_all();
             return new ServiceResponse.for_json(
@@ -560,7 +560,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
 
-    public ServiceResponse? register_playlist_with_songs(
+    public async ServiceResponse? register_playlist_with_songs(
             string playlist_name, Gee.List<PostFileData> file_list) throws OnnojiError {
         try {
 
@@ -789,7 +789,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
         }
     }
     
-    public ServiceResponse? register_genre_icon(int genre_id, string genre_icon_file_path) throws OnnojiError {
+    public async ServiceResponse? register_genre_icon(int genre_id, string genre_icon_file_path) throws OnnojiError {
         string dest_genre_icon_file_path = "%s/gnr%012d".printf(genre_icon_base_path, genre_id);
         debug("src_genre_icon_file_path = %s\n", genre_icon_file_path);
         debug("dest_genre_icon_file_path = %s\n", dest_genre_icon_file_path);

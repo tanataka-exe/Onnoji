@@ -115,8 +115,8 @@ public class RealApplicationContext : ApplicationContext, Object {
         return server;
     }
 
-    public OnnojiThreadData get_onnoji_thread_data() throws Error {
-        return new OnnojiThreadData() {
+    public OnnojiActionHandler get_onnoji_action_handler() throws Error {
+        return new OnnojiActionHandler() {
             producer = get_music_data_producer(),
             access_control_allow_origin = get_resource_manager().get_string("server.access-control-allow-origin")
         };

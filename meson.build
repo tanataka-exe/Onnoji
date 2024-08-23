@@ -45,6 +45,7 @@ common_sources = files([
   'src/common/Values.vala',
   'src/common/OnnojiError.vala',
   'src/common/OnnojiPaths.vala',
+  'src/common/OnnojiFileUtils.vala',
   'src/common/functions.vala',
   'src/common/timestamp.c'
 ])
@@ -106,7 +107,7 @@ batch_sources = files([
 
 server_sources = files([
   'src/server/Onnoji.vala',
-  'src/server/OnnojiThreadData.vala'
+  'src/server/OnnojiActionHandler.vala'
 ])
 
 test_sources = files([
