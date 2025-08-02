@@ -36,11 +36,30 @@ public class RealApplicationContext : ApplicationContext, Object {
     }
 
     public Gda.Connection get_gda_connection() throws Error {
+        string? config_db_provider = null;
+        string? config_db_cns = null;
+        string? config_db_auth = null;
+
+        config_db_provider = Environment.get_variable("ONNOJI_CONFIG_DB_PROVIDER");
+        if (config_db_provider == null) {
+            config_db_provider = get_resource_manager().get_string("db.provider");
+        }
+
+        config_db_cns = Environment.get_variable("ONNOJI_CONFIG_DB_CNS");
+        if (config_db_cns == null) {
+            config_db_cns = get_resource_manager().get_string("db.cns");
+        }
+        
+        config_db_auth = Environment.get_variable("ONNOJI_CONFIG_DB_AUTH");
+        if (config_db_auth == null) {
+            config_db_auth = get_resource_manager().get_string("db.auth");
+        }
+        
         if (this.conn == null) {
             this.conn = Gda.Connection.open_from_string(
-                get_resource_manager().get_string("db.provider"),
-                get_resource_manager().get_string("db.cns"),
-                get_resource_manager().get_string("db.auth"), 0
+                config_db_provider,
+                config_db_cns,
+                config_db_auth, 0
             );
         } else if (!this.conn.is_opened()) {
             this.conn.open();
@@ -116,9 +135,18 @@ public class RealApplicationContext : ApplicationContext, Object {
     }
 
     public OnnojiActionHandler get_onnoji_action_handler() throws Error {
+        string? onnoji_config_access_control_allow_origin = null;
+
+        onnoji_config_access_control_allow_origin =
+                Environment.get_variable("ONNOJI_CONFIG_ACCESS_CONTROL_ALLOW_ORIGIN");
+        if (onnoji_config_access_control_allow_origin == null) {
+            onnoji_config_access_control_allow_origin =
+                    get_resource_manager().get_string("server.access-control-allow-origin");
+        }
+        
         return new OnnojiActionHandler() {
             producer = get_music_data_producer(),
-            access_control_allow_origin = get_resource_manager().get_string("server.access-control-allow-origin")
+            access_control_allow_origin = onnoji_config_access_control_allow_origin
         };
     }
 
@@ -131,6 +159,22 @@ public class RealApplicationContext : ApplicationContext, Object {
     }
     
     public MusicDataProducer get_music_data_producer() throws Error {
+        string? config_artwork_path = Environment.get_variable("ONNOJI_CONFIG_ARTWORK_PATH");
+        string? config_song_path = Environment.get_variable("ONNOJI_CONFIG_SONG_PATH");
+        string? config_genre_path = Environment.get_variable("ONNOJI_CONFIG_GENRE_PATH");
+        string? config_genre_default_icon_path = Environment.get_variable("ONNOJI_CONFIG_GENRE_DEFAULT_ICON_PATH");
+        if (config_artwork_path == null) {
+            config_artwork_path = get_resource_manager().get_string("server.path.artwork");
+        }
+        if (config_song_path == null) {
+            config_song_path = get_resource_manager().get_string("server.path.song");
+        }
+        if (config_genre_path == null) {
+            config_genre_path = get_resource_manager().get_string("server.path.genre");
+        }
+        if (config_genre_default_icon_path == null) {
+            config_genre_default_icon_path = get_resource_manager().get_string("server.path.genre-default-icon");
+        }
         return new MusicDataProducerImpl1() {
             song_repo = get_song_repository(),
             genre_repo = get_genre_repository(),
@@ -140,10 +184,10 @@ public class RealApplicationContext : ApplicationContext, Object {
             artwork_repo = get_artwork_repository(),
             json_maker = get_response_json_maker(),
             file_adapter = get_moegi_file_info_adapter(),
-            artwork_base_path = get_resource_manager().get_string("server.path.artwork"),
-            song_base_path = get_resource_manager().get_string("server.path.song"),
-            genre_icon_base_path = get_resource_manager().get_string("server.path.genre"),
-            genre_default_icon_path = get_resource_manager().get_string("server.path.genre-default-icon"),
+            artwork_base_path = config_artwork_path,
+            song_base_path = config_song_path,
+            genre_icon_base_path = config_genre_path,
+            genre_default_icon_path = config_genre_default_icon_path,
             artwork_default_resource_uri = "/local/asusturn/onnoji/images/empty-image200.png"
         };
     }

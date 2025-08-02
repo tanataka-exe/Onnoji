@@ -4,8 +4,6 @@ project(
   version: '1.0.0'
 )
 
-add_global_arguments('-O2', language: 'c')
-
 subproject('gxml').get_variable('libgxml_build_dir')
 
 dependencies = [
@@ -219,7 +217,8 @@ onnoji = executable(
   + resource_sources
   + gst_utils_sources
   + asresources,
-  dependencies: dependencies
+  dependencies: dependencies,
+  install: true
 )
   
 test('insert artist', repository_test, args: ['artist', 'insert'])

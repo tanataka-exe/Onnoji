@@ -19,7 +19,7 @@ int main(string[] args) {
         Gee.List<string> genre_names = new Gee.ArrayList<string>();
         Gee.List<string> artist_names = new Gee.ArrayList<string>();
         Gee.List<string> sql_list = new Gee.ArrayList<string>();
-        foreach (Playlist playlist in playlists[0:1]) {
+        foreach (Playlist playlist in playlists) {
             if (!playlist.is_album) {
                 continue;
             }
@@ -31,24 +31,31 @@ int main(string[] args) {
                 }
                 Moegi.FileInfo info = file_info_adapter.read_metadata_from_path(song.file_path);
                 string sql = "update song set\n";
-                sql += "  title = '%s',\n".printf(info.title);
+                bool comma_needed = false;
+                if (song.title.collate(info.title) != 0) {
+                    sql += "  title = '%s'\n".printf(info.title);
+                    comma_needed = true;
+                }
                 if (info.comment != null) {
-                    sql += "  comment = '%s',\n".printf(info.comment);
-                } else {
-                    sql += "  comment = null,\n";
+                    sql += "  %s comment = '%s'\n".printf(comma_needed ? "," : "", info.comment);
+                    comma_needed = true;
                 }
                 if (info.copyright != null) {
-                    sql += "  copyright = '%s',\n".printf(info.copyright);
-                } else {
-                    sql += "  copyright = null,\n";
+                    sql += "  %s copyright = '%s'\n".printf(comma_needed ? "," : "", info.copyright);
+                    comma_needed = true;
                 }
-                sql += "  time_length_milliseconds = %u\n".printf(info.time_length_milliseconds);
+                if (info.time_length_milliseconds > 0) {
+                    sql += "  %s time_length_milliseconds = %u\n".printf(comma_needed ? "," : "", info.time_length_milliseconds);
+                }
                 sql += "where\n";
                 sql += "  song_id = %d;\n".printf(song.song_id);
-                sql_list.add(sql);
+                if (info.title.collate(song.title) != 0 || info.comment != null || info.copyright != null) {
+                    sql_list.add(sql);
+                }
                 Gee.List<Genre> old_genres = genre_repo.select_by_song_id(song.song_id);
                 if (info.genre != null) {
                     string[] genre_parted = info.genre.split(",");
+                    sql_list.add("delete from song_genre where song_id = %d;\n".printf(song.song_id));
                     foreach (string genre_name in genre_parted) {
                         genre_name = genre_name.strip();
                         int genre_id = genre_names.index_of(genre_name) + 1;
@@ -62,15 +69,11 @@ int main(string[] args) {
                             sql_list.add(link_sql);
                         }
                     }
-                } else {
-                    foreach(Genre genre in old_genres) {
-                        // song_repository.delete_link_to_genre(song, genre);
-                        sql_list.add("delete from song_genre where song_id = %d and genre_id = %d;\n".printf(song.song_id, genre.genre_id));
-                    }
                 }
                 Gee.List<Artist> old_artists = artist_repo.select_by_song_id(song.song_id);
                 if (info.artist != null) {
                     string[] artist_parted = info.artist.split(",");
+                    sql_list.add("delete from song_artist where song_id = %d;\n".printf(song.song_id));
                     foreach (string artist_name in artist_parted) {
                         artist_name = artist_name.strip();
                         int artist_id = artist_names.index_of(artist_name) + 1;
@@ -83,11 +86,6 @@ int main(string[] args) {
                         if (sql_list.index_of(link_sql) < 0) {
                             sql_list.add(link_sql);
                         }
-                    }
-                } else {
-                    foreach (Artist artist in old_artists) {
-                        sql_list.add("delete from song_artist where song_id = %d and artist_id = %d;\n".printf(
-                                song.song_id, artist.artist_id));
                     }
                 }
                 sql_list.add("\n");

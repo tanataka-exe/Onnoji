@@ -1,5 +1,6 @@
 import { useState, useRef, useContext } from 'react';
 import ViewContext from './ViewContext.js';
+import MessageBox from './MessageBox.js';
 
 export default function UploadPage() {
   const formRef = useRef();
@@ -8,6 +9,8 @@ export default function UploadPage() {
   const [ files, setFiles ] = useState([]);
   const [ uploading, setUploading ] = useState(false);
   const { appConfig, appState, viewSwitcher } = useContext(ViewContext);
+  const [ showMessage, setShowMessage ] = useState(false);
+  const [ messageText, setMessageText ] = useState("");
   
   async function submitForm(event) {
     event.preventDefault();
@@ -24,13 +27,24 @@ export default function UploadPage() {
       formData.append('uploaded-file', files[i]);
     }
     setUploading(true);
-    var response = await fetch(`http://${appConfig.apiHost}:${appConfig.apiPort}/api/v2/album`, {
-      method: "POST",
-      body: formData
-    });
+    try {
+      var response = await fetch(`http://${appConfig.apiHost}:${appConfig.apiPort}/api/v2/album`, {
+        method: "POST",
+        body: formData
+      });
+      const restext = await response.text();
+      console.log(`${response.status}: ${restext}`);
+      if (response.ok) {
+        setMessageText(`成功: ${restext}`);
+      } else {
+        setMessageText(`失敗: ${restext}`);
+      }
+    } catch (err) {
+      console.error(err);
+      setMessageText("通信エラーが発生しました");
+    }
     setUploading(false);
-    var restext = await response.text();
-    console.log(restext);
+    setShowMessage(true);
   }
 
   function selectFiles(event) {
@@ -78,6 +92,12 @@ export default function UploadPage() {
           <input type="submit" className="btn btn-primary" value="アップロード"/>
         </div>
       </form>
+      {/*メッセージボックス*/}
+      <MessageBox
+        show={showMessage}
+        message={messageText}
+        onOk={()=>setShowMessage(false)}
+      />
     </div>
   );
 }

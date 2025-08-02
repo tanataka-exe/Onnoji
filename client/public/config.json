@@ -1,6 +1,6 @@
 {
     "title": "~onnoji~",
-    "apiHost": "localhost",
+    "apiHost": "n100buntu",
     "apiPort": 8765,
     "recentCount": 50
 }
