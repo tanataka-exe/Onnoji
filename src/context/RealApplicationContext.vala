@@ -41,7 +41,7 @@ public class RealApplicationContext : ApplicationContext, Object {
         }
         return config;
     }
-        
+
     public ResourceManager get_resource_manager() throws Error {
         if (resource == null) {
             resource = new ResourceManager.for_uri("resource:///local/asusturn/onnoji/main/application.properties");
@@ -65,7 +65,7 @@ public class RealApplicationContext : ApplicationContext, Object {
         if (config_db_provider == null) {
             config_db_provider = get_config().get_string("BasicSettings", "db.provider");
         }
-
+        
         config_db_cns = Environment.get_variable("ONNOJI_CONFIG_DB_CNS");
         if (config_db_cns == null) {
             config_db_cns = get_config().get_string("BasicSettings", "db.cns");
@@ -149,9 +149,15 @@ public class RealApplicationContext : ApplicationContext, Object {
     }
     
     public Soup.Server get_server() throws Error {
-        int port = get_config().get_integer("BasicSettings", "server.port");
+        string config_server_port_str = Environment.get_variable("ONNOJI_CONFIG_SERVER_PORT");
+        int config_server_port = 0;
+        if (config_server_port_str == null) {
+            config_server_port = get_config().get_integer("BasicSettings", "server.port");
+        } else {
+            config_server_port = int.parse(config_server_port_str);
+        }
         Soup.Server server = new Soup.Server("server-header", null);
-        server.listen_all(port, 0);
+        server.listen_all(config_server_port, 0);
         return server;
     }
 
