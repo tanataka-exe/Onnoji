@@ -1,4 +1,6 @@
 public interface ApplicationContext : Object {
+    public abstract string get_config_file_path() throws Error;
+    public abstract KeyFile get_config() throws Error;
     public abstract ResourceManager get_resource_manager() throws Error;
     public abstract XmlResourceManager get_xml_resource_manager() throws Error;
     public abstract Gda.Connection get_gda_connection() throws Error;
@@ -12,7 +14,5 @@ public interface ApplicationContext : Object {
     public abstract OnnojiActionHandler get_onnoji_action_handler() throws Error;
     public abstract MusicDataProducer get_music_data_producer() throws Error;
     public abstract ResponseJsonMaker get_response_json_maker() throws Error;
-    //public abstract OnnojiBatch get_onnoji_batch() throws Error;
-    //public abstract BatchTask get_batch_task() throws Error;
     public abstract void finalize() throws Error;
 }

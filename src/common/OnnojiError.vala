@@ -4,5 +4,6 @@ public errordomain OnnojiError {
     FILE_ERROR,
     LOGICAL_ERROR,
     RESOURCE_ERROR,
+    CONFIG_NOT_EXIST,
     OTHER_ERROR
 }

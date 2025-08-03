@@ -54,8 +54,17 @@ public class Onnoji : GLib.Object {
             
             return 0;
         } catch (Error e) {
-            printerr("ERROR: %s (%d)\n", e.message, e.code);
-            return -1;
+            if (e is OnnojiError.CONFIG_NOT_EXIST) {
+                ApplicationContext context = RealApplicationContext.get_instance();
+                string config_file_path = context.get_config_file_path();
+                FileUtils.set_contents(config_file_path, context.get_resource_manager().get_content());
+                printerr("Config file is created at %s\n", config_file_path);
+                printerr("Please edit this file and start the server again.\n\n");
+                return 0;
+            } else {
+                printerr("ERROR: %s (%d)\n", e.message, e.code);
+                return -1;
+            }
         }
     }
 }
