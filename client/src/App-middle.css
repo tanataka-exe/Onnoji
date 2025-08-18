@@ -1,0 +1,45 @@
+@media screen and (min-width: 650px) and (max-width: 999px) {
+    .playlist-artwork {
+        width: 100px;
+    }
+
+    .left-pane {
+        height: 100dvh;
+        display: grid;
+        grid-template-rows: 2em 1fr;
+        overflow: auto;
+        min-height: 0;
+        border-right: 1px solid #DDD;
+        width: 0px; /* 0 width - change this with JavaScript */
+        position: fixed; /* Stay in place */
+        z-index: 10; /* Stay on top */
+        top: 0; /* Stay at the top */
+        left: 0;
+        background-color: #DDD; /* Black*/
+        transition: 0.2s; /* 0.2 second transition effect to slide in the sidenav */
+        box-shadow: 30px 1px 100px rgba(0, 0, 0, 0.3);
+    }
+    
+    .center-pane {
+        height: 100dvh;
+        display: grid;
+        grid-template-rows: 2em 1fr;   /* 上は中身サイズ、下は余り全部 */
+        overflow: auto;
+        min-height: 0;
+        width: 40%;
+        min-width: 350px;
+        background-color: #EEE;
+        border-right: 1px solid #DDD;
+    }
+
+    .right-pane {
+        height: 100dvh;
+        width: 100%;
+        display: grid;
+        grid-template-rows: 2em 1fr;   /* 上は中身サイズ、下は余り全部 */
+        overflow: auto;
+        min-height: 0;
+        z-index: 1;
+    }
+}
+

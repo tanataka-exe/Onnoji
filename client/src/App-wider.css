@@ -1,0 +1,37 @@
+@media screen and (min-width: 1000px) {
+    .playlist-artwork {
+        width: 100px;
+    }
+
+    .left-pane {
+        height: 100dvh;
+        width: 30%;
+        min-width: 250px;
+        background-color: #DDD;
+        border-right: 1px solid #BBB;
+        display: grid;
+        grid-template-rows: 2em 1fr;
+        overflow: hidden;
+    }
+
+    .center-pane {
+        height: 100dvh;                 /* iOSでも素直に効く */
+        display: grid;
+        grid-template-rows: 2em 1fr;   /* 上は中身サイズ、下は余り全部 */
+        overflow: hidden;               /* 本体はスクロールさせない */
+        border-right: 1px solid #DDD;
+        background-color: #EEE;
+        width: 70%;
+        min-width: 350px;
+    }
+
+    .right-pane {
+        height: 100dvh;                 /* iOSでも素直に効く */
+        display: grid;
+        grid-template-rows: 2em 1fr;   /* 上は中身サイズ、下は余り全部 */
+        overflow: hidden;               /* 本体はスクロールさせない */
+        width: 100%;
+    }
+
+}
+

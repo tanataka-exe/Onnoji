@@ -1,0 +1,50 @@
+.upload-dialog {
+    margin: 30px auto;
+    background-color: white;
+    padding: 12px 20px 20px 20px;
+    border: 1px solid #DDD;
+    border-radius: 1em;
+    position: fixed;
+    left: 50%;
+    right: 50%;
+    top: 50%;
+    width: 500px;
+    transform: translate(-50%, -100%);
+    z-index: 60;
+}
+.upload-dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.upload-dialog button, .uploa-dialog input[type='submit'] {
+    border: 1px solid #99A;
+    border-radius: 3px;
+    padding: 4px;
+}
+.dialog-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #DDD;
+}
+.dialog-header button {
+    background-color: white;
+    border: 1px solid #AAA;
+    border-radius: 3px;
+    display: grid;
+    align-items: center;
+    padding: 5px;
+}
+.dialog-header button:hover {
+    background-color: #EEE;
+}
+.dialog-header button:active {
+    background-color: #DDD;
+}
+.dialog-header button img {
+    width: 20px;
+    height: 20px;
+}

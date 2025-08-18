@@ -1,0 +1,52 @@
+@media screen and (max-width: 649px) {
+
+    .playlist-artwork {
+        width: 150px;
+    }
+
+    .left-pane {
+        height: 100dvh; /* 100% Full-height */
+        display: grid;
+        grid-template-rows: 2em 1fr;
+        overflow: hidden;
+        border-right: 1px solid #BBB;
+        width: 0; /* 0 width - change this with JavaScript */
+        position: fixed; /* Stay in place */
+        z-index: 10; /* Stay on top */
+        top: 0; /* Stay at the top */
+        left: 0;
+        background-color: #DDD; /* Black*/
+        transition: 0.2s; /* 0.5 second transition effect to slide in the sidenav */
+        box-shadow: 30px 1px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .center-pane {
+        height: 100dvh; /* 100% Full-height */
+        display: grid;
+        grid-template-rows: 2em 1fr;
+        border-right: 1px solid #DDD;
+        width: 0; /* 0 width - change this with JavaScript */
+        position: fixed; /* Stay in place */
+        z-index: 2; /* Stay on top */
+        top: 0; /* Stay at the top */
+        left: 0;
+        background-color: #EEE; /* Black*/
+        overflow: hidden; /* Disable horizontal scroll */
+        transition: 0.2s; /* 0.5 second transition effect to slide in the sidenav */
+    }
+
+    .right-pane {
+        height: 100dvh;
+        width: 100%;
+        display: grid;
+        grid-template-rows: 2em 1fr;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    #right-pane-return-button img {
+        height: 16px;
+        width: 16px;
+    }
+}
+
