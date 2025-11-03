@@ -8,7 +8,24 @@ export default function UploadDialog(props) {
   const filesRef = useRef();
   const [ files, setFiles ] = useState([]);
   const [ uploading, setUploading ] = useState(false);
+  const [ isSubmitButtonDisabled, setSubmitButtonDisabled ] = useState(false);
 
+  async function submitFormTest(event) {
+    event.preventDefault();
+    const albumName = albumNameRef.current.value;
+    console.log(`albumName : ${albumName}`);
+    console.log(`files.length : ${files.length}`);
+    let messageText = "";
+    if (albumName == "") {
+      messageText = "アルバム名が空なんだが";
+      props.onMessage(messageText, false);
+      console.log("dialog close");
+      return;
+    }
+    setSubmitButtonDisabled(true);
+    props.onMessage("テスト", true);
+  }
+  
   async function submitForm(event) {
     event.preventDefault();
     const albumName = albumNameRef.current.value;
@@ -21,7 +38,7 @@ export default function UploadDialog(props) {
       } else if (files.length == 0) {
         messageText = "ファイルが選択されていない";
       }
-      props.onMessage(messageText);
+      props.onMessage(messageText, false);
       console.log("dialog close");
       return;
     }
@@ -33,6 +50,7 @@ export default function UploadDialog(props) {
       formData.append('uploaded-file', files[i]);
     }
     setUploading(true);
+    setSubmitButtonDisabled(true);
     try {
       var response = await fetch(`http://${props.appConfig.apiHost}:${props.appConfig.apiPort}/api/v2/album`, {
         method: "POST",
@@ -49,7 +67,7 @@ export default function UploadDialog(props) {
       console.error(err);
       messageText = "通信エラーが発生しました";
     }
-    props.onMessage(messageText);
+    props.onMessage(messageText, true);
     setUploading(false);
   }
 
@@ -100,7 +118,7 @@ export default function UploadDialog(props) {
               <input type="file" name="uploaded-files" className="form-control form-control-lg" ref={filesRef} onChange={selectFiles} multiple/>
             </div>
             <div style={{girdRow: '2 / 3', gridColumn: '2 / 3',display:'grid',alignItems: 'center'}}>
-              <input type="submit" className="btn btn-primary" value="アップロード"/>
+              <input type="submit" className="btn btn-primary" disabled={isSubmitButtonDisabled} value="アップロード"/>
             </div>
           </div>
         </form>

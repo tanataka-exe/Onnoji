@@ -27,7 +27,7 @@ h1 {
 }
 
 .left-pane .header {
-    height: 2em;
+    height: 36px;
     width: 100%;
     display: flex;
     align-items: center;
@@ -36,7 +36,7 @@ h1 {
 }
 
 .center-pane .header {
-    height: 2em;
+    height: 36px;
     border-bottom: 1px solid #DDD;
     display: flex;
     align-items: center;
@@ -45,7 +45,7 @@ h1 {
 }
 
 .right-pane .header {
-    height: 2em;
+    height: 36px;
     border-bottom: 1px solid #DDD;
     display: flex;
     align-itmes: center;
@@ -78,7 +78,22 @@ h1 {
 #left-header-right-button button:active {
     background-color: #AAB;
 }
-
+#center-header-left-buttons {
+    display: grid;
+    align-items: center;
+    border: none;
+    background-color: inherit;
+    border-radius: 3px;
+    padding: 3px;    
+}
+#right-header-left-buttons {
+    display: grid;
+    align-items: center;
+    border: none;
+    background-color: inherit;
+    border-radius: 3px;
+    padding: 3px;    
+}
 #side-menu {
     display: none;
     position: fixed;
@@ -216,6 +231,16 @@ h1 {
     flex-direction: column;
     gap: 10px;
 }
+.dark-mask {
+    display: block;
+    z-index: 9;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background-color: rgba(0.0, 0.0, 0.0, 0.5);
+}
 .light-mask {
     width: 100%;
     height: 100%;
@@ -316,24 +341,38 @@ h1 {
 }
 .player-panel.open { transform: translateY(0); }
 .player-indicator input[type="range"] {
-  width: 100%;
-  appearance: none;
-  height: 4px;
-  background: rgba(255,255,255,.25);
-  outline: none;
-  border-radius: 999px;
+    width: 100%;
+    appearance: none;
+    height: 2px;
+    background: rgba(255,255,255,.25);
+    outline: none;
+    border-radius: 0;
+}
+/*Chrome,Safari,Edge*/
+.player-indicator input[type="range"]::-webkit-slider-runnable-track {
+    /*background:gray;*/
+    height:5px;
 }
 .player-indicator input[type="range"]::-webkit-slider-thumb {
-  appearance: none;
-  width: 14px; height: 14px; border-radius: 50%;
-  background: white;
-  margin-top: -5px;
-  box-shadow: 0 0 0 3px rgba(255,255,255,.25);
+    appearance: none;
+    width: 4px;
+    height: 12px;
+    /*border-radius: 50%;*/
+    background: white;
+    margin-top: -4px;
+    box-shadow: 0 0 0 3px rgba(255,255,255,.25);
+}
+/*Firefox*/
+.player-indicator input[type="range"]::-moz-range-track {
+    /*background-color:gray;*/
+    height:4px;
 }
 .player-indicator input[type="range"]::-moz-range-thumb {
-  width: 14px; height: 14px; border-radius: 50%;
-  background: white; border: none;
-  box-shadow: 0 0 0 3px rgba(255,255,255,.25);
+    width: 4px;
+    height: 12px;
+    border-radius: 0;
+    background: white; border: none;
+    box-shadow: 0 0 0 3px rgba(255,255,255,.25);
 }
 
 .player-buttons {
@@ -343,8 +382,15 @@ h1 {
     gap: 12px;
     padding: 8px 12px 12px;
 }
+
 .player-buttons * {
     color: #EEE;
+}
+.player-buttons-1 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
 }
 .player-buttons-2 .btn {
     background: none;
@@ -365,6 +411,12 @@ h1 {
 }
 .player-buttons-2 btn:active {
     background: rgba(255, 255, 255, 0.1);
+}
+.player-audio-title {
+    font-weight: bold;
+}
+.player-artist-name {
+    font-size: small;
 }
 .player-buttons .play { font-size: 24px; }
 .player-buttons .prev, .player-buttons .next { opacity: .9; }

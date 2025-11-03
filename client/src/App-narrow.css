@@ -7,7 +7,7 @@
     .left-pane {
         height: 100dvh; /* 100% Full-height */
         display: grid;
-        grid-template-rows: 2em 1fr;
+        grid-template-rows: 36px 1fr;
         overflow: hidden;
         border-right: 1px solid #BBB;
         width: 0; /* 0 width - change this with JavaScript */
@@ -23,7 +23,7 @@
     .center-pane {
         height: 100dvh; /* 100% Full-height */
         display: grid;
-        grid-template-rows: 2em 1fr;
+        grid-template-rows: 36px 1fr;
         border-right: 1px solid #DDD;
         width: 0; /* 0 width - change this with JavaScript */
         position: fixed; /* Stay in place */
@@ -39,7 +39,7 @@
         height: 100dvh;
         width: 100%;
         display: grid;
-        grid-template-rows: 2em 1fr;
+        grid-template-rows: 36px 1fr;
         overflow: hidden;
         z-index: 1;
     }
@@ -47,6 +47,15 @@
     #right-pane-return-button img {
         height: 16px;
         width: 16px;
+    }
+
+    .player-buttons {
+        display: flex;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 8px 12px 12px;
     }
 }
 

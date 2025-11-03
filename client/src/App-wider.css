@@ -10,14 +10,14 @@
         background-color: #DDD;
         border-right: 1px solid #BBB;
         display: grid;
-        grid-template-rows: 2em 1fr;
+        grid-template-rows: 36px 1fr;
         overflow: hidden;
     }
 
     .center-pane {
         height: 100dvh;                 /* iOSでも素直に効く */
         display: grid;
-        grid-template-rows: 2em 1fr;   /* 上は中身サイズ、下は余り全部 */
+        grid-template-rows: 36px 1fr;   /* 上は中身サイズ、下は余り全部 */
         overflow: hidden;               /* 本体はスクロールさせない */
         border-right: 1px solid #DDD;
         background-color: #EEE;
@@ -28,7 +28,7 @@
     .right-pane {
         height: 100dvh;                 /* iOSでも素直に効く */
         display: grid;
-        grid-template-rows: 2em 1fr;   /* 上は中身サイズ、下は余り全部 */
+        grid-template-rows: 36px 1fr;   /* 上は中身サイズ、下は余り全部 */
         overflow: hidden;               /* 本体はスクロールさせない */
         width: 100%;
     }

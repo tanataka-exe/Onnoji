@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import Optional from "./Optional.js";
 import useMediaQuery from "./useMediaQuery.js";
 import UploadDialog from "./UploadDialog.js";
+import LogWindow from './LogWindow.js';
+import SelectGenreDialog from "./SelectGenreDialog.js";
 import goPreviousIcon from "./images/go-previous-symbolic.svg";
 import sidebarShowIcon from "./images/sidebar-show-symbolic.svg";
 import closeButtonIcon from "./images/application-exit-symbolic.svg";
@@ -36,22 +38,6 @@ const Consts = {
     LEFT_PANE_SHOWING: 9,
     DIALOG_SHOWING: 50,
     MESSAGE_SHOWING: 60
-  },
-  
-  darkMaskStyle: {
-    SHOWN: {
-      display: "block",
-      zIndex: 9, /* Consts.darkMaskZIndex.LEFT_PANE_SHOWING */
-      position: "fixed",
-      width: "100%",
-      height: "100%",
-      left: "0",
-      top: "0",
-      backgroundColor: "rgba(0.0, 0.0, 0.0, 0.5)"
-    },
-    HIDDEN: {
-      display: "none"
-    }
   }
 }
 
@@ -74,7 +60,6 @@ export default function App() {
   
   // State.
   const [ songListEventIndex, setSongListEventIndex ] = useState(-1);
-  const [ currentIndex, setCurrentIndex ] = useState(0);
   const [ appConfig, setAppConfig ] = useState(null);
   const [ genres, setGenres ] = useState([]);
   const [ centerPaneTitle, setCenterPaneTitle ] = useState("");
@@ -93,11 +78,16 @@ export default function App() {
   const [ currentPlaylistId, setCurrentPlaylistId ] = useState(-1);
   const [ currentPlaylist, setCurrentPlaylist ] = useState({});
   const [ currentPlayingIndex, setCurrentPlayingIndex ] = useState(-1);
+  const [ currentPlayingArtwork, setCurrentPlayingArtwork ] = useState(null);
 
   // Styles (panes).
   const [ leftPaneStyle, setLeftPaneStyle ] = useState({});
   const [ centerPaneStyle, setCenterPaneStyle ] = useState({});
   const [ rightPaneStyle, setRightPaneStyle ] = useState({});
+
+  // Styles (mask).
+  const [ isDarkMaskPresent, setDarkMaskPresent ] = useState(false);
+  const [ darkMaskZIndex, setDarkMaskZIndex ] = useState(Consts.darkMaskZIndex.LEFT_PANE_SHOWING);
   const [ lightMaskStyle, setLightMaskStyle ] = useState({display: "none"});
 
   // Styles (header buttons).
@@ -108,12 +98,12 @@ export default function App() {
   const [ sidemenuStyle, setSidemenuStyle ] = useState({});
 
   // Styles (parts).
-  const [ darkMaskStyle, setDarkMaskStyle ] = useState(Consts.darkMaskStyle.HIDDEN);
   const [ rightContentStyle, setRightContentStyle ] = useState({});
   const [ genreListStyle, setGenreListStyle ] = useState({display:"block"});
   const [ moreAlbumsButtonStyle, setMoreAlbumsButtonStyle ] = useState({display:"none"});
   const [ isUploadDialogShowing, setUploadDialogShowing ] = useState(false);
-
+  const [ isGenreDialogShowing, setGenreDialogShowing ] = useState(false);
+  
   // Refs.
   const playerRef = useRef(null);
   const albumListRef = useRef(null);
@@ -129,22 +119,32 @@ export default function App() {
   const darkMaskRef = useRef(null);
   
   // Message Box
-  const [ showMessage, setShowMessage ] = useState(false);
+  const [ isMessageBoxPresent, setMessageBoxPresent ] = useState(false);
   const [ messageBoxText, setMessageBoxText ] = useState("");
+  const [ isCloseParent, setCloseParent ] = useState(false);
+
+  // Log Window
+  const [ isLogWindowPresent, setLogWindowPresent ] = useState(false);
+  const [ logList, setLogList ] = useState([]);
+
+  function log(text) {
+    console.log(text);
+    setLogList(logList => [...logList, [logList.length, text]].slice(-100));
+  }
   
   function showLeftPane(isOpen) {
     if (isOpen) {
       if (isMid) {
         setLeftPaneStyle({width: Consts.LEFT_PANE_MIDDLE_WIDTH});
-        setDarkMaskStyle(Consts.darkMaskStyle.SHOWN);
+        setDarkMaskPresent(true);
       } else if (isNarrow) {
         setLeftPaneStyle({width: Consts.LEFT_PANE_NARROW_WIDTH});
-        setDarkMaskStyle(Consts.darkMaskStyle.SHOWN);
+        setDarkMaskPresent(true);
       }
     } else {
       if (isNarrow || isMid) {
         setLeftPaneStyle({width: 0});
-        setDarkMaskStyle(Consts.darkMaskStyle.HIDDEN);
+        setDarkMaskPresent(false);
       }
     }
   }
@@ -167,11 +167,22 @@ export default function App() {
   useEffect(() => {
     const mode = isWide ? "wide" : isMid ? "mid" : isNarrow ? "narrow" : null;
     if (mode === "wide") {
-      console.log("wide");
+      log("wide");
       setLeftPaneStyle({});
       setCenterPaneStyle({});
       setRightPaneStyle({});
-      setDarkMaskStyle(Consts.darkMaskStyle.HIDDEN);
+      if (isLogWindowPresent) {
+        setDarkMaskPresent(true);
+        setDarkMaskZIndex(Consts.darkMaskZIndex.DIALOG_SHOWING);
+      } else if (isMessageBoxPresent) {
+        setDarkMaskPresent(true);
+        setDarkMaskZIndex(Consts.darkMaskZIndex.MESSAGE_SHOWING);
+      } else if (isUploadDialogShowing) {
+        setDarkMaskPresent(true);
+        setDarkMaskZIndex(Consts.darkMaskZIndex.DIALOG_SHOWING);
+      } else {
+        setDarkMaskPresent(false);
+      }
       setLeftCloseButtonStyle({
         display: "none"
       });
@@ -183,11 +194,11 @@ export default function App() {
         display: "none"
       });
     } else if (mode === "mid") {
-      console.log("mid");
+      log("mid");
       setLeftPaneStyle({});
       setCenterPaneStyle({});
       setRightPaneStyle({});
-      setDarkMaskStyle(Consts.darkMaskStyle.HIDDEN);
+      setDarkMaskPresent(false);
       setLeftCloseButtonStyle({
         display: "block"
       });
@@ -205,11 +216,11 @@ export default function App() {
         showLeftPane(true);
       }
     } else if (mode === "narrow") {
-      console.log("narrow");
+      log("narrow");
       setLeftPaneStyle({});
       setCenterPaneStyle({});
       setRightPaneStyle({});
-      setDarkMaskStyle(Consts.darkMaskStyle.HIDDEN);
+      setDarkMaskPresent(false);
       setLeftCloseButtonStyle({
         display: "block"
       });
@@ -239,7 +250,7 @@ export default function App() {
       if (response.ok) {
         setAppConfig(await response.json());
       } else {
-        console.log("config is not found!");
+        log("config is not found!");
       }
     };
 
@@ -291,7 +302,7 @@ export default function App() {
         const json = await response.json();
         setGenres(json.genres);
       } else {
-        console.log(await response.text());
+        log(await response.text());
       }
     };
     fetchData();
@@ -331,7 +342,7 @@ export default function App() {
           album.artists = null;
         }
       } else {
-        console.log(await artistRes.text());
+        log(await artistRes.text());
       }
     }
   }
@@ -342,7 +353,7 @@ export default function App() {
       return;
     }
     const fetchData = async () => {
-      console.log("Genre " + currentGenre.genreName + " was selected");
+      log("Genre " + currentGenre.genreName + " was selected");
       const response = await fetch(
         `http://${appConfig.apiHost}:${appConfig.apiPort}${currentGenre.albums}`
       );
@@ -352,7 +363,7 @@ export default function App() {
         await arrangeAlbumList(albums);
         setAlbumList(albums);
       } else {
-        console.log(await response.text());
+        log(await response.text());
       }
     };
     setMoreAlbumsButtonStyle({"display":"none"});
@@ -366,7 +377,7 @@ export default function App() {
       return;
     }
     const fetchData = async () => {
-      console.log(selectedAlbum);
+      log(JSON.stringify(selectedAlbum));
       const songsRes = await fetch(
         `http://${appConfig.apiHost}:${appConfig.apiPort}/api/v2/playlist/${selectedAlbum.albumId}/songs`
       );
@@ -409,8 +420,8 @@ export default function App() {
       for (const sibling of songListRef.current.children) {
         sibling.style.backgroundColor = null;
       }
-      console.log("selectedAlbum.albumId === currentPlaylistId:");
-      console.log(`  ${selectedAlbum.albumId} === ${currentPlaylistId}`);
+      log("selectedAlbum.albumId === currentPlaylistId:");
+      log(`  ${selectedAlbum.albumId} === ${currentPlaylistId}`);
       if (selectedAlbum.albumId === currentPlaylistId
           && currentPlayingIndex >= 0
           && songListRef.current.children.length > currentPlayingIndex) {
@@ -455,26 +466,34 @@ export default function App() {
   const onNext = () => {
     playerMethods.next();
   };
-  
+
+
   useEffect(() => {
     if (audioSrc != null) {
-      const audioReload = async () => {
-        try {
+      try {
+        if (playerRef.current.paused) {
           playerRef.current.pause();
-          playerRef.current.load();
-          await playerRef.current.play();
-        } catch (e) {
-          if (e.name === "NotAllowedError") {
-            console.log("NotAllowedError");
-          }
+          log("pause");
         }
-      };
-      audioReload();
+      } catch (e) {
+        if (e.name === "NotAllowedError") {
+          log("NotAllowedError");
+        }
+      }
+      try {
+        playerRef.current.load();
+        log("load");
+      } catch (e) {
+        if (e.name === "NotAllowedError") {
+          log("NotAllowedError");
+        }
+      }
     }
   }, [audioSrc]);
 
+
   useEffect(() => {
-    console.log("setCurrentPlayingIndex(-1)");
+    log("setCurrentPlayingIndex(-1)");
     setCurrentPlayingIndex(-1);
   }, [currentPlaylistId]);
   
@@ -490,6 +509,7 @@ export default function App() {
         = "rgba(0.5, 0.5, 0.5, 0.2)";
       setPanelOpen(true);
       setAudioSrc(`http://${appConfig.apiHost}:${appConfig.apiPort}${currentPlaylist[currentPlayingIndex].stream}`);
+      setCurrentPlayingArtwork(`http://${appConfig.apiHost}:${appConfig.apiPort}${currentPlaylist[currentPlayingIndex].artwork}`);
     }
   }, [currentPlaylistId, currentPlayingIndex]);
 
@@ -523,7 +543,7 @@ export default function App() {
         } else if (isMid) {
           setLeftPaneStyle({width: 0});
         }
-        setDarkMaskStyle(Consts.darkMaskStyle.HIDDEN);
+        setDarkMaskPresent(false);
       }
     };
     setMoreAlbumsButtonStyle({"display":"block"});
@@ -539,29 +559,53 @@ export default function App() {
     displayUploadDialog();
   }
 
+  function onLogViewButtonClicked() {
+    setSidemenuOpen(false);
+    setDarkMaskPresent(true);
+    setDarkMaskZIndex(Consts.darkMaskZIndex.DIALOG_SHOWING);
+    setLogWindowPresent(true);
+  }
+
+  function closeLogWindow() {
+    if (isWide) {
+      setDarkMaskPresent(false);
+    } else {
+      setDarkMaskPresent(true);
+      setDarkMaskZIndex(Consts.darkMaskZIndex.LEFT_PANE_SHOWING);
+    }
+    setLogWindowPresent(false);
+  }
+  
   function displayUploadDialog() {
-    setDarkMaskStyle({
-      ...Consts.darkMaskStyle.SHOWN,
-      zIndex: Consts.darkMaskZIndex.DIALOG_SHOWING
-    });
+    setDarkMaskPresent(true);
+    setDarkMaskZIndex(Consts.darkMaskZIndex.DIALOG_SHOWING);
     setUploadDialogShowing(true);
   }
 
   function closeUploadDialog() {
-    if (isWide) {
-      setDarkMaskStyle(Consts.darkMaskStyle.HIDDEN);
-    } else {
-      setDarkMaskStyle(Consts.darkMaskStyle.SHOWN);
-    }
     setUploadDialogShowing(false);
+    if (isWide) {
+      setDarkMaskPresent(false);
+    } else {
+      log(`leftPaneStyle.width: ${leftPaneStyle.width}`);
+      if (leftPaneStyle.width != "0px") {
+        setDarkMaskZIndex(Consts.darkMaskZIndex.LEFT_PANE_SHOWING);
+      } else {
+        setDarkMaskPresent(false);
+      }
+    }
   }
   
   function onPlaylistButtonClicked() {
 
   }
+
+  function onGenreSelected() {
+
+  }
   
   function onGenreLabelClicked() {
-    console.log("genre label was cliecked.");
+    log("genre label was cliecked.");
     setGenreListStyle({
       display: (genreListStyle.display === "none" ? "block" : "none")
     });
@@ -578,7 +622,7 @@ export default function App() {
     } else if (isMid) {
       setLeftPaneStyle({width: 0});
     }
-    setDarkMaskStyle(Consts.darkMaskStyle.HIDDEN);
+    setDarkMaskPresent(false);
   }
 
   function onAlbumClicked(e, album) {
@@ -597,7 +641,7 @@ export default function App() {
       }
       showCenterPane(false);
     } catch (e) {
-      console.log("Error!");
+      log("Error!");
     }
   }
 
@@ -615,7 +659,7 @@ export default function App() {
 
   function onDarkMaskClicked() {
     if (isNarrow || isMid) {
-      if (darkMaskStyle.zIndex == Consts.darkMaskZIndex.LEFT_PANE_SHOWING) {
+      if (darkMaskZIndex == Consts.darkMaskZIndex.LEFT_PANE_SHOWING) {
         showLeftPane(false);
       }
     }
@@ -644,7 +688,7 @@ export default function App() {
         setTimeout(() => {
           playerRef.current.autoplay = true;
           setCurrentPlayingIndex(index);
-          console.log("song was selected.");
+          log("song was selected.");
         }, 0);
       }
       setSongListEventIndex(-1);
@@ -653,7 +697,7 @@ export default function App() {
   
   const playerMethods = {
     play: () => {
-      console.log('playerMethod.play');
+      log('play');
       //addHistory();
     },
 
@@ -668,21 +712,54 @@ export default function App() {
     },
     
     pause: () => {
-      console.log('playerMethod.pause');
-    },
-    
-    prepared: () => {
+      log('pause');
     },
 
+    canplay: () => {
+      log("canplay");
+      try {
+        playerRef.current.play();
+      } catch (e) {
+        if (e.name === "NotAllowedError") {
+          log("NotAllowedError");
+        }
+      }
+    },
+    
+    canplaythrough: () => {
+      log("canplaythrough");
+    },
+
+    waiting: () => {
+      log("waiting");
+    },
+
+    stalled: async () => {
+      // 楽曲読み込みが止まってしまった場合、0.3秒待ってから再度再生する。
+      log("stalled");
+      try {
+        await new Promise((resolve, reject) => {
+          playerRef.current.load();
+          setTimeout(() => {
+            log("delay 1000 milliseconds");
+            resolve(null);
+          }, 1000)
+        }); // delay 1000 millis.
+        playerRef.current.play();
+      } catch(e) {
+        log("stalled -> play -> Error");
+      }
+    },
+    
     ended: () => {
-      console.log("music ended");
-      console.log("currentPlayingIndex < currentPlaylist.length - 1");
-      console.log(`  ${currentPlayingIndex} < ${currentPlaylist.length - 1}`);
+      log("ended");
+      log("currentPlayingIndex < currentPlaylist.length - 1");
+      log(`  ${currentPlayingIndex} < ${currentPlaylist.length - 1}`);
       if (currentPlayingIndex < (currentPlaylist.length - 1)) {
-        console.log(`playerMethod.ended set currentIndex = ${currentIndex + 1}`);
+        log(`playerMethod.ended set currentPlayingIndex = ${currentPlayingIndex + 1}`);
         setCurrentPlayingIndex(currentPlayingIndex => currentPlayingIndex + 1);
       } else {
-        console.log('playerMethod.ended set currentIndex = 0');
+        log('playerMethod.ended set currentPlayigIndex = 0');
         setCurrentPlayingIndex(-1);
       }
     }
@@ -693,9 +770,9 @@ export default function App() {
       const songId = currentPlaylist[currentPlayingIndex].songId;
       const historyRes = await fetch(`http://${appConfig.apiHost}:${appConfig.apiPort}/api/v2/history/${songId}`, {method: "POST"});
       const historyJson = await historyRes.json();
-      console.log("addHistory result: " + JSON.stringify(historyJson));
+      log("addHistory result: " + JSON.stringify(historyJson));
     } catch (error) {
-      console.log("ERROR: " + JSON.stringify(error));
+      log("ERROR: " + JSON.stringify(error));
     }
   }
 
@@ -705,18 +782,26 @@ export default function App() {
     }
   }
 
-  function showMessageBox(message) {
-    setDarkMaskStyle({...Consts.darkMaskStyle.SHOWN, zIndex: Consts.darkMaskZIndex.MESSAGE_SHOWING});
+  function showMessageBox(message, isCloseParentFlag) {
+    setDarkMaskPresent(true);
     setMessageBoxText(message);
-    setShowMessage(true);
+    setMessageBoxPresent(true);
+    setDarkMaskZIndex(Consts.darkMaskZIndex.MESSAGE_SHOWING);
+    setCloseParent(isCloseParentFlag);
   }
 
   function closeMessageBox() {
-    setShowMessage(false);
-    if (isUploadDialogShowing) {
-      setDarkMaskStyle({...Consts.darkMaskStyle.SHOWN, zIndex: Consts.darkMaskZIndex.DIALOG_SHOWING});
+    setMessageBoxPresent(false);
+    if (isCloseParent) {
+      setUploadDialogShowing(false);
+      setCloseParent(false);
+      if (!isWide && leftPaneStyle.width != "0px") {
+        setDarkMaskZIndex(Consts.darkMaskZIndex.LEFT_PANE_SHOWING);
+      } else {
+        setDarkMaskPresent(false);
+      }
     } else {
-      setDarkMaskStyle(Consts.darkMaskStyle.HIDDEN);
+      setDarkMaskZIndex(Consts.darkMaskZIndex.DIALOG_SHOWING);
     }
   }
   
@@ -872,23 +957,13 @@ export default function App() {
                type={mimeType}
                onPlay={playerMethods.play}
                onPause={playerMethods.pause}
-               onCanPlayThrough={playerMethods.prepared}
+               onCanPlay={playerMethods.canplay}
+               onCanPlayThrough={playerMethods.canplaythrough}
+               onWaiting={playerMethods.waiting}
+               onStalled={playerMethods.stalled}
                onEnded={playerMethods.ended}>
           あなたのブラウザーはオーディオ要素をサポートしていません。
         </audio>
-        <div className="player-title">
-          <div>
-          </div>
-          <div>
-            {currentPlaylist[currentPlayingIndex]?.title}
-            {currentPlaylist[currentPlayingIndex] && currentPlaylist[currentPlayingIndex].artists
-             ? " (" + currentPlaylist[currentPlayingIndex].artists?.map(artist => artist.artistName).join(", ") + ")"
-             : null}
-          </div>
-          <div>
-            {formatTimeLengthMillis(Math.floor(playerRef.current?.currentTime) * 1000)}
-          </div>
-        </div>
         <div className="player-indicator">
           <input
             type="range"
@@ -900,21 +975,41 @@ export default function App() {
           />
         </div>
         <div className="player-buttons">
-          <div className="player-buttons-1"></div>
+          <div className="player-buttons-1">
+            <img src={currentPlayingArtwork} width="48" height="48"/>
+            <div>
+              <div className="player-audio-title">
+                {currentPlaylist[currentPlayingIndex]?.title}
+              </div>
+              <div className="player-artist-name">
+                {currentPlaylist[currentPlayingIndex] && currentPlaylist[currentPlayingIndex].artists
+                 ? currentPlaylist[currentPlayingIndex].artists?.map(artist => artist.artistName).join(", ")
+                 : null}
+              </div>
+            </div>
+          </div>
           <div className="player-buttons-2">
-            <button className="btn prev" aria-label="Previous" onClick={onPrev}>⏮</button>
+            { !isNarrow ? 
+              <button className="btn prev" aria-label="Previous" onClick={onPrev}>⏮</button> : null}
             <button className="btn play" aria-label="Play/Pause" onClick={onToggle}>⏯</button>
-            <button className="btn next" aria-label="Next" onClick={onNext}>⏭</button>
+            { !isNarrow ?
+              <button className="btn next" aria-label="Next" onClick={onNext}>⏭</button> : null}
           </div>
-          <div className="player-buttons-3">
-          </div>
+          {!isNarrow ? 
+           <div className="player-buttons-3">
+             {formatTimeLengthMillis(Math.floor(playerRef.current?.currentTime) * 1000)}
+           </div> : null}
         </div>
       </div>
       {/* アップロード・ダイアログ */}
       {isUploadDialogShowing ? 
        <UploadDialog appConfig={appConfig}
                      onClose={closeUploadDialog}
-                     onMessage={(message) => showMessageBox(message)}/> : null}
+                     onMessage={(message, isCloseParent) => showMessageBox(message, isCloseParent)}/> : null}
+      {isGenreDialogShowing ?
+       <SelectGenreDialog appConfig={appConfig}
+                          onSelect={onGenreSelected}
+                          onMessage={(message, isCloseParent) => showMessageBox(message, isCloseParent)}/> : null}
       {/* サイド・メニュー (左ペインのメニューボタンを押すと表示する */}
       <div id="side-menu" className="light-shadow" style={sidemenuStyle}>
         <ul>
@@ -923,18 +1018,29 @@ export default function App() {
               アルバムをアップロード
             </button>
           </li>
+          <li>
+            <button id="view-log-button" className="header-button" onClick={onLogViewButtonClicked}>
+              ログを見る
+            </button>
+          </li>
         </ul>
       </div>
       {/* 暗いスクリーン・マスク */}
-      <div id="dark-mask" className="dark-mask" style={darkMaskStyle} onMouseDown={onDarkMaskClicked}></div> 
+      { isDarkMaskPresent ? 
+        <div id="dark-mask" className="dark-mask" style={{zIndex: darkMaskZIndex}} onMouseDown={onDarkMaskClicked}></div> : null }
       {/* 明るいスクリーン・マスク */}
       <div id="light-mask" className="light-mask" style={lightMaskStyle} onMouseDown={onMouseDownMenuMask}></div>
       {/*メッセージボックス*/}
-      {showMessage ?
+      {isMessageBoxPresent ?
        <MessageBox
          message={messageBoxText}
-         onOk={closeMessageBox}/>
+         onOk={(isCloseParent) => closeMessageBox(isCloseParent)}/>
        : null}
+      {isLogWindowPresent ?
+       <LogWindow appConfig={appConfig}
+                  logList={logList}
+                  onClose={closeLogWindow}
+                  onMessage={(message) => showMessageBox(message)}/> : null}
     </>
   );
 }

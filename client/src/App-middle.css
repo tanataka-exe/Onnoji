@@ -6,7 +6,7 @@
     .left-pane {
         height: 100dvh;
         display: grid;
-        grid-template-rows: 2em 1fr;
+        grid-template-rows: 36px 1fr;
         overflow: auto;
         min-height: 0;
         border-right: 1px solid #DDD;
@@ -23,7 +23,7 @@
     .center-pane {
         height: 100dvh;
         display: grid;
-        grid-template-rows: 2em 1fr;   /* 上は中身サイズ、下は余り全部 */
+        grid-template-rows: 36px 1fr;   /* 上は中身サイズ、下は余り全部 */
         overflow: auto;
         min-height: 0;
         width: 40%;
@@ -36,7 +36,7 @@
         height: 100dvh;
         width: 100%;
         display: grid;
-        grid-template-rows: 2em 1fr;   /* 上は中身サイズ、下は余り全部 */
+        grid-template-rows: 36px 1fr;   /* 上は中身サイズ、下は余り全部 */
         overflow: auto;
         min-height: 0;
         z-index: 1;
