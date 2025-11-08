@@ -12,7 +12,7 @@ dependencies = [
   dependency('gstreamer-1.0'),
   dependency('gee-0.8'),
   dependency('json-glib-1.0'),
-  dependency('libgda-5.0'),
+  dependency('libgda-6.0'),
   dependency('libsoup-2.4'),
   dependency('gdk-3.0'),
   dependency('libxml-2.0'),
