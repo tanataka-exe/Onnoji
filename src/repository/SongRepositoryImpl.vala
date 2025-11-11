@@ -181,7 +181,7 @@ public class SongRepositoryImpl : SongRepository, BasicRepositoryImpl {
                 digest = iter.get_value_at(7).get_string(),
                 file_path = iter.get_value_at(8).get_string(),
                 artwork_id = iter.get_value_at(9).get_int(),
-                creation_datetime = (Gda.Timestamp) iter.get_value_at(10).get_boxed()
+                creation_datetime = (DateTime) iter.get_value_at(10).get_boxed()
             });
         }
         return list;
@@ -241,7 +241,7 @@ public class SongRepositoryImpl : SongRepository, BasicRepositoryImpl {
                 Values.of_string(song.digest),
                 Values.of_string(song.file_path),
                 Values.of_int(song.artwork_id),
-                Values.of_gda_timestamp(song.creation_datetime)
+                Values.of_datetime(song.creation_datetime)
             )
         );
     }

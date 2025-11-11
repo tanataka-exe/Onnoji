@@ -21,7 +21,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
             history_repo.insert(new History() {
                 history_id = history_id,
                 song_id = song_id,
-                request_datetime = create_gda_timestamp_now_local()
+                request_datetime = new DateTime.now_local()
             });
             return new ServiceResponse.for_json(
                 json_maker.object_node(json_maker.success_object())
@@ -574,8 +574,8 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
                 playlist_id = playlist_id,
                 playlist_name = playlist_name,
                 is_album = true,
-                creation_datetime = create_gda_timestamp_now_local(),
-                update_datetime = create_gda_timestamp_now_local()
+                creation_datetime = new DateTime.now_local(),
+                update_datetime = new DateTime.now_local()
             };
             playlist_repo.insert(new_album);
 
@@ -739,7 +739,7 @@ public class MusicDataProducerImpl1 : MusicDataProducer, Object {
                     file_path = "%s/sng%012d".printf(song_base_path, song_id),
                     digest = song_md5sum,
                     artwork_id = (artwork == null ? 0 : artwork.artwork_id),
-                    creation_datetime = create_gda_timestamp_now_local()
+                    creation_datetime = new DateTime.now_local()
                 };
 
                 song_repo.insert(song);

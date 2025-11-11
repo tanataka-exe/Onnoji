@@ -44,8 +44,8 @@ common_sources = files([
   'src/common/OnnojiError.vala',
   'src/common/OnnojiPaths.vala',
   'src/common/OnnojiFileUtils.vala',
-  'src/common/functions.vala',
-  'src/common/timestamp.c'
+  'src/common/functions.vala'
+#  'src/common/timestamp.c'
 ])
 
 resource_sources = files([

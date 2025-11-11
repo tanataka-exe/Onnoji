@@ -16,7 +16,7 @@ namespace PlaylistTest {
             playlist[0].playlist_id,
             playlist[0].playlist_name,
             playlist[0].is_album ? " (album)" : "",
-            format_gda_timestamp(playlist[0].creation_datetime, "%Y-%m-%d %H:%M:%S")
+            playlist[0].creation_datetime.format("%Y-%m-%d %H:%M:%S")
         );
         return 0;
     }

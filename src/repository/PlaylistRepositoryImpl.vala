@@ -159,7 +159,7 @@ public class PlaylistRepositoryImpl : PlaylistRepository, BasicRepositoryImpl {
     public bool update_by_id(int playlist_id, SList<string> col_names, SList<Value?> col_values) throws Error {
         if (col_names.search<string>("update_datetime", (a, b) => a.collate(b)) == null) {
             col_names.append("update_datetime");
-            col_values.append(Values.of_gda_timestamp(create_gda_timestamp_now_local()));
+            col_values.append(Values.of_datetime(new DateTime.now_local()));
         }
         return conn.update_row_in_table_v(
             "playlist",
@@ -179,7 +179,7 @@ public class PlaylistRepositoryImpl : PlaylistRepository, BasicRepositoryImpl {
                 ),
                 Values.of_string(playlist.playlist_name),
                 Values.of_string(playlist.is_album ? "1" : "0"),
-                Values.of_gda_timestamp(playlist.creation_datetime)
+                Values.of_datetime(playlist.creation_datetime)
             )
         );
     }
@@ -245,8 +245,8 @@ public class PlaylistRepositoryImpl : PlaylistRepository, BasicRepositoryImpl {
                 playlist_id = iter.get_value_at(0).get_int(),
                 playlist_name = iter.get_value_at(1).get_string(),
                 is_album = iter.get_value_at(2).get_string() == "1",
-                creation_datetime = (Gda.Timestamp) iter.get_value_at(3).get_boxed(),
-                update_datetime = (Gda.Timestamp) iter.get_value_at(4)?.get_boxed()
+                creation_datetime = (DateTime) iter.get_value_at(3).get_boxed(),
+                update_datetime = (DateTime) iter.get_value_at(4)?.get_boxed()
             });
         }
         return list;

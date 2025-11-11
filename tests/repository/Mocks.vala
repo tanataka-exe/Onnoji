@@ -10,7 +10,7 @@ namespace Mocks {
             mime_type = "text/plain",
             file_path = "/path/to/the/file",
             artwork_id = 10000,
-            creation_datetime = create_gda_timestamp_now_local()
+            creation_datetime = new DateTime.now_local()
         };
     }
     
@@ -33,7 +33,7 @@ namespace Mocks {
             playlist_id = playlist_id,
             playlist_name = "Test Playlist",
             is_album = true,
-            creation_datetime = create_gda_timestamp_now_local(),
+            creation_datetime = new DateTime.now_local(),
         };
     }
 }
