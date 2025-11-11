@@ -16,11 +16,11 @@ namespace Values {
         result.set_string(string_param);
         return result;
     }
-    
-    public Value of_gda_timestamp(Gda.Timestamp? timestamp_param) {
-        if (timestamp_param != null) {
-            Value result = Value(typeof(Gda.Timestamp));
-            result.set_boxed(timestamp_param);
+
+    public Value of_datetime(DateTime? datetime_param) {
+        if (datetime_param != null) {
+            Value result = Value(typeof(DateTime));
+            result.set_boxed(datetime_param);
             return result;
         } else {
             return Value(Type.NONE);

@@ -11,10 +11,6 @@ public class Onnoji : GLib.Object {
         
         Gst.init(ref args);
 
-        // Initialize Gda library
-        
-        Gda.init();
-        
         try {
             // Create a context object (The dependency resolver)
             

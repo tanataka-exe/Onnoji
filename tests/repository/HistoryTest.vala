@@ -10,7 +10,7 @@ namespace HistoryTest {
                 if (history.size == 1) {
                     print("%d: %d, %s\n",
                         history[0].history_id, history[0].song_id,
-                        format_gda_timestamp(history[0].request_datetime, "%Y-%m-%d %H:%M:%S")
+                        history[0].request_datetime.format("%Y-%m-%d %H:%M:%S")
                     );
                 } else {
                     print("The history of id %d is not found\n", i);
@@ -32,7 +32,7 @@ namespace HistoryTest {
                     var song = repo2.select_by_id(history[0].song_id);
                     print("%d: %s (%d), %s\n",
                         history[0].history_id, song[0].title, history[0].song_id,
-                        format_gda_timestamp(history[0].request_datetime, "%Y-%m-%d %H:%M:%S")
+                        history[0].request_datetime.format("%Y-%m-%d %H:%M:%S")
                     );
                 } else {
                     print("The history of id %d is not found\n", i);
@@ -49,7 +49,7 @@ namespace HistoryTest {
         var history = new History() {
             history_id = HISTORY_ID_0,
             song_id = SONG_ID_0,
-            request_datetime = create_gda_timestamp_now_local()
+            request_datetime = new DateTime.now_local()
         };
         bool response = repo.insert(history);
         print("insert status: %s\n", response ? "Success" : "Failure");
@@ -65,9 +65,9 @@ namespace HistoryTest {
 
     int test_update(RepositoryTestContext context) throws Error {
         var repo = context.get_history_repository();
-        var ts = create_gda_timestamp_now_local();
-        print("timezone: %ld\n", ts.timezone);
-        var params = create_map("request_datetime", Values.of_gda_timestamp(ts));
+        var dt = new DateTime.now_local();
+        print("timezone: %d\n", dt.get_timezone().get_offset(0));
+        var params = create_map("request_datetime", Values.of_datetime(dt));
         bool response = repo.update_by_id(HISTORY_ID_0, params);
         print("update status: %s\n", response ? "Success" : "Failure");
         return 0;

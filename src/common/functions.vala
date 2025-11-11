@@ -1,8 +1,8 @@
-extern Gda.Timestamp create_gda_timestamp();
-extern Gda.Timestamp create_gda_timestamp_with_datetime(int year, int month, int day,
-        int hour, int minute, int second);
-extern Gda.Timestamp create_gda_timestamp_with_date(int year, int month, int day);
-extern Gda.Timestamp create_gda_timestamp_now_local();
+//extern Gda.Timestamp create_gda_timestamp();
+//extern Gda.Timestamp create_gda_timestamp_with_datetime(int year, int month, int day,
+//        int hour, int minute, int second);
+//extern Gda.Timestamp create_gda_timestamp_with_date(int year, int month, int day);
+//extern Gda.Timestamp create_gda_timestamp_now_local();
 
 string get_lan_ip() throws SpawnError {
     string output;
@@ -10,10 +10,12 @@ string get_lan_ip() throws SpawnError {
     return output.strip();
 }
 
+/*
 string format_gda_timestamp(Gda.Timestamp ts, string format) {
     DateTime dt = new DateTime.local(ts.year, ts.month, ts.day, ts.hour, ts.minute, (double) ts.second);
     return dt.format(format);
 }
+*/
 
 Gee.Map create_map(string first_key, ...) {
     var l = va_list();

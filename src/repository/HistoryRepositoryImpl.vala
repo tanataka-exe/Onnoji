@@ -61,13 +61,13 @@ public class HistoryRepositoryImpl : HistoryRepository, BasicRepositoryImpl {
             list.add(new History() {
                 history_id = iter.get_value_at(0).get_int(),
                 song_id = iter.get_value_at(1).get_int(),
-                request_datetime = (Gda.Timestamp) iter.get_value_at(2).get_boxed()
+                request_datetime = (DateTime) iter.get_value_at(2).get_boxed()
             });
         }
         return list;
     }
 
-    public Gee.List<History> select_by_request_datetime(Gda.Timestamp request_datetime, SqlConditionType condition_type) throws Error {
+    public Gee.List<History> select_by_request_datetime(DateTime request_datetime, SqlConditionType condition_type) throws Error {
         string sql;
         string param_name;
         if (GREATER_THAN in condition_type && LESS_THAN in condition_type) {
@@ -93,7 +93,7 @@ public class HistoryRepositoryImpl : HistoryRepository, BasicRepositoryImpl {
             throw new OnnojiError.SQL_ERROR("At least 1 condition type must be specified");
         }
         
-        return fetch_history(sql, param_name, Values.of_gda_timestamp(request_datetime));
+        return fetch_history(sql, param_name, Values.of_datetime(request_datetime));
     }
 
     private Gee.List<History> fetch_history(string sql, ...) throws Error {
@@ -119,7 +119,7 @@ public class HistoryRepositoryImpl : HistoryRepository, BasicRepositoryImpl {
             list.add(new History() {
                 history_id = iter.get_value_at(0).get_int(),
                 song_id = iter.get_value_at(1).get_int(),
-                request_datetime = (Gda.Timestamp) iter.get_value_at(2).get_boxed()
+                request_datetime = (DateTime) iter.get_value_at(2).get_boxed()
             });
         }
         
@@ -156,7 +156,7 @@ public class HistoryRepositoryImpl : HistoryRepository, BasicRepositoryImpl {
                     GENERATE_NEXT_ID in flags ? get_next_history_id() : history.history_id
                 ),
                 Values.of_int(history.song_id),
-                Values.of_gda_timestamp(history.request_datetime)
+                Values.of_datetime(history.request_datetime)
             )
         );
     }

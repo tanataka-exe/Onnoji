@@ -9,6 +9,7 @@ int main(string[] args) {
     bool is_transactional = args.length == 4 && args[3] == "transactional";
     
     Gda.Connection? conn = null;
+    int exit_code = -1;
     
     try {
         var context = RepositoryTestContext.get_instance();
@@ -16,19 +17,23 @@ int main(string[] args) {
         conn = context.get_gda_connection();
 
         if (is_transactional) {
-            return test_transactional(context, target, command);
+            exit_code = test_transactional(context, target, command);
         } else {
-            return test(context, target, command);
+            exit_code = test(context, target, command);
         }
     } catch (Error e) {
         printerr("ERROR %d: %s\n", e.code, e.message);
-        return -1;
+        exit_code = -1;
         
     } finally {
-        if (conn != null) {
-            conn.close();
+        try {
+            conn?.close();
+        } catch (Error e) {
+            exit_code = -1;
         }
     }
+    
+    return exit_code;
 }
 
 int test_transactional(RepositoryTestContext context, string target, string command) throws Error {

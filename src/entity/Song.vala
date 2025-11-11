@@ -9,5 +9,5 @@ public class Song : Object {
     public string file_path { get; set; }
     public string digest { get; set; }
     public int artwork_id { get; set; }
-    public Gda.Timestamp creation_datetime { get; set; }
+    public DateTime creation_datetime { get; set; }
 }
